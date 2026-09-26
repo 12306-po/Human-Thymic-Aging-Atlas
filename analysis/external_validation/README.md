@@ -48,7 +48,8 @@ python "$repo/analysis/external_validation/44_plot_hra007984_validation.py" \
 
 The convenience wrapper `run_hra007984_external_validation.sh` performs the
 same sequence and writes SHA-256 checksums.  Edit the reviewed cell-type map
-before running.  Exact column names in the published Seurat object must be
+before running, or point `CELLTYPE_MAP` to a reviewed copy outside the Git
+working tree. Exact column names in the published Seurat object must be
 confirmed from `metadata_column_audit.tsv`; command-line examples above are
 placeholders, not assumed facts.
 
@@ -59,4 +60,3 @@ four eligible independent external donors have donor-resolved predictions and
 numeric exact ages.  Even then, four donors are insufficient to establish a
 validated clinical age clock.  If exact ages are unavailable, predictions are
 retained but age-performance metrics are not calculated.
-

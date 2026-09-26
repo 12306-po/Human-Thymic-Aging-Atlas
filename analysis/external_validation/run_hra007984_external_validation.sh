@@ -5,6 +5,7 @@ set -euo pipefail
 : "${HRA_RDS:?Set HRA_RDS to thymus.sc.RDS from Zenodo 13207776}"
 REPO="${REPO:-$PROJECT/Human-Thymic-Aging-Atlas}"
 OUT="${OUT:-$PROJECT/09_external_human/HRA007984_frozen_transfer}"
+CELLTYPE_MAP="${CELLTYPE_MAP:-$REPO/analysis/external_validation/hra007984_celltype_map.tsv}"
 PYTHON_BIN="${PYTHON_BIN:-$(command -v python3)}"
 RSCRIPT_BIN="${RSCRIPT_BIN:-$(command -v Rscript)}"
 
@@ -22,7 +23,7 @@ fi
 "$RSCRIPT_BIN" "$REPO/analysis/external_validation/42_prepare_hra007984_seurat.R" \
   --rds "$HRA_RDS" \
   --selected-dictionary "$OUT/frozen_model/selected_feature_dictionary.tsv" \
-  --celltype-map "$REPO/analysis/external_validation/hra007984_celltype_map.tsv" \
+  --celltype-map "$CELLTYPE_MAP" \
   --output "$OUT/prepared" "${@:1}"
 
 "$PYTHON_BIN" "$REPO/analysis/external_validation/43_score_hra007984_frozen.py" \
@@ -37,4 +38,3 @@ fi
 
 find "$OUT" -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > "$OUT/SHA256SUMS.txt"
 echo "Completed HRA007984 frozen-model feasibility workflow: $OUT"
-

@@ -1,0 +1,9 @@
+{
+  "gene_summary_has_FOXN1": true,
+  "gene_effect_rows": 103094,
+  "unique_genes": 17181,
+  "donors": 18,
+  "cell_types": 11,
+  "duplicate_gene_context_rows": 0,
+  "donor_composition_available": false
+}

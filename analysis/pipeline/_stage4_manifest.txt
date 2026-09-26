@@ -1,0 +1,5 @@
+R|17_external_human_validation.R|17_external_human
+py|18a_ortholog_mapping.py|18a_ortholog
+R|18_mouse_scRNA_cross_species_validation.R|18_mouse_scRNA
+R|19_mouse_scATAC_validation.R|19_mouse_scATAC
+py|20_final_multiomics_integration.py|20_final_integration

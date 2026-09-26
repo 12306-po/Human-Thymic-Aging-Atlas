@@ -1,0 +1,15 @@
+{
+  "atlas_name": "Human Thymic Aging Atlas",
+  "release": "v1.0-18donor",
+  "primary_cohort": "GSE231906",
+  "n_donors": 18,
+  "n_gene_context_rows": 103094,
+  "n_unique_genes": 17181,
+  "n_cell_contexts": 12,
+  "donor_composition_available": false,
+  "limitations": [
+    "Captured-library composition follows nominal 6:4 CD45-positive/CD45-negative recombination and is not native-tissue composition.",
+    "Donor deviation is descriptive and internally evaluated; it is not a clinical biological-age score.",
+    "External human cohorts are registered but not combined until donor-level audit and overlap checks are complete."
+  ]
+}

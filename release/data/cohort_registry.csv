@@ -1,0 +1,5 @@
+cohort_id,role,n_independent_donors,age_range,health_status_audit,eligible_for_model_training,status
+GSE231906,primary_discovery,18,4-69 years,unresolved in reviewed public donor metadata,True,included
+E-MTAB-8581,candidate_external_biology,,"prenatal, pediatric and adult",pending donor-level audit,False,not imported
+GSE147520,candidate_external_biology,5,fetal to 25 years,pending donor-level audit; one adult sample,False,not imported
+HRA007984,candidate_external_validation,16,prenatal to geriatric,reported healthy; exact donor metadata audit pending,False,not imported

@@ -1,0 +1,1 @@
+cohort_id,donor_id,source_sample_id,exact_age_years,age_unit,sex,health_status,thymus_type,platform,sorting_strategy,n_cells_post_qc,source_url,overlap_flag,aging_eligible,exclusion_reason

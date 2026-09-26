@@ -26,6 +26,8 @@ An interactive, donor-resolved results atlas for continuous-age analyses of the 
 ├── build_atlas.py
 ├── export_server_inputs.py
 ├── analysis/pipeline/
+├── analysis/external_validation/
+├── analysis/publication_figures_v3/
 ├── docs/MANUSCRIPT_CODE_MAP.md
 ├── assets/
 ├── release/data/
@@ -75,6 +77,29 @@ python analysis/pipeline/99_make_paper_figures.py \
   --output /data/zxy/projects/human_thymus_age_ML_DL/figures_final_revised \
   --hallmark-gmt /absolute/path/h.all.v2023.2.Hs.symbols.gmt
 ```
+
+The restrained publication versions of Figures 1–5 are generated from the
+frozen release tables and figure-specific audit tables by
+`analysis/publication_figures_v3/plot_main_figures_v3.py`. The program writes
+PDF and SVG vector figures plus 600-dpi PNG/TIFF derivatives. UMAP and marker
+dot-plot display panels may be rasterized inside the otherwise-vector output;
+quantitative values are never digitized from an image.
+
+## Prespecified HRA007984 transfer test
+
+`analysis/external_validation/` contains a fail-closed workflow for the
+HRA007984/Zenodo 13207776 processed Seurat object. It freezes the GSE231906
+Elastic Net feature order, imputation values, scaling parameters, coefficients
+and intercept before external donor ages are used; audits donor metadata and an
+author-approved cell-type crosswalk; constructs donor-resolved compatible
+features; and applies the frozen model without refitting or calibration.
+
+The code package is **not itself an external-validation result**. The current
+release contains no HRA007984 predictions because the 4.4-GB Seurat object has
+not yet been executed through the workflow. Follow
+`analysis/external_validation/README.md` on the analysis server. The workflow
+stops if donor identity, exact age, health status, cohort overlap or frozen-
+feature coverage cannot be verified.
 
 ## Main release files
 

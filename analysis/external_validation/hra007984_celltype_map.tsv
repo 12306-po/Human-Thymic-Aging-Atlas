@@ -1,0 +1,10 @@
+external_label	broad_cell_type	include	review_status
+# Replace the example rows below with labels printed by 42_prepare_hra007984_seurat.R.		FALSE	REQUIRES_AUTHOR_REVIEW
+DN_early	DN	FALSE	EXAMPLE_ONLY
+DP_blast	DP	FALSE	EXAMPLE_ONLY
+CD4T	SP_CD4	FALSE	EXAMPLE_ONLY
+CD8T	SP_CD8	FALSE	EXAMPLE_ONLY
+cTEC	TEC	FALSE	EXAMPLE_ONLY
+mTEC	TEC	FALSE	EXAMPLE_ONLY
+Fb	Fibroblast	FALSE	EXAMPLE_ONLY
+

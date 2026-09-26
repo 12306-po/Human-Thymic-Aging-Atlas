@@ -10,6 +10,7 @@ venv/
 env/
 _vendor/
 Human_Thymic_Aging_Atlas_v*.zip
+release/figures_restyled/*.tif
 *.tmp
 *.bak
 ~$*

@@ -1,0 +1,15 @@
+{
+  "figures": [
+    "Figure1_restyled",
+    "Figure2_restyled",
+    "Figure3_restyled",
+    "Figure4_restyled",
+    "Figure5_restyled"
+  ],
+  "source_values_digitized_from_images": false,
+  "figure1_display_panels": [
+    "F:\\\u8bba\u6587\u6750\u6599\\Human_Thymic_Aging_Atlas\\release\\source_files\\figure1_umap_panel.png",
+    "F:\\\u8bba\u6587\u6750\u6599\\Human_Thymic_Aging_Atlas\\release\\source_files\\figure1_marker_dotplot_panel.png"
+  ],
+  "note": "UMAP/dotplot may be rasterized; quantitative panels are source-table driven."
+}

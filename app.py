@@ -71,7 +71,7 @@ with hero_left:
 with hero_right:
     image = ASSETS / "healthy_human_t_cell.jpg"
     if image.exists():
-        st.image(str(image), use_column_width=True)
+        st.image(str(image),  width="stretch")
         st.markdown('<div class="image-credit">Healthy human T lymphocyte, scanning electron micrograph. NIAID/NIH, public domain. Decorative context; not study data.</div>', unsafe_allow_html=True)
 st.write("")
 scope_note()
@@ -84,7 +84,7 @@ with overview_tab:
     with left:
         lobule = ASSETS / "thymus_lobule_nih_bioart.svg"
         if lobule.exists():
-            st.image(str(lobule), use_column_width=True)
+            st.image(str(lobule),  width="stretch")
             st.markdown('<div class="image-credit">Thymus lobule © Human Reference Atlas / NIAID NIH BioArt, CC BY 4.0. Decorative anatomical context; not study data.</div>', unsafe_allow_html=True)
     with right:
         c1, c2 = st.columns(2)

@@ -55,6 +55,25 @@ def scope_note() -> None:
         '<div class="scope-note"><strong>Interpretation boundary.</strong> Release v1 summarizes donor-resolved analyses of GSE231906 (18 donors). Captured-library fractions follow nominal 6:4 CD45-positive/CD45-negative recombination and are not native-tissue composition. Donor deviation is descriptive and is not a validated clinical biological-age score.</div>',
         unsafe_allow_html=True,
     )
+def community_submission_signature(raw_files: dict[str, bytes], manual_map: dict[str, str]) -> str:
+    digest = sha256()
+    for name in sorted(raw_files):
+        digest.update(name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(raw_files[name])
+        digest.update(b"\0")
+    for label in sorted(manual_map):
+        digest.update(b"map\0")
+        digest.update(label.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(manual_map[label].encode("utf-8"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+def clear_community_submission_state() -> None:
+    for key in list(st.session_state):
+        if key.startswith("community_") or key.startswith("map_"):
+            del st.session_state[key]
 gene_summary = load_csv("gene_summary.csv.gz")
 effects = load_csv("gene_context_effects.csv.gz")
 gene_pathways = load_csv("gene_pathway_links.csv.gz")
@@ -71,7 +90,7 @@ with hero_left:
 with hero_right:
     image = ASSETS / "healthy_human_t_cell.jpg"
     if image.exists():
-        st.image(str(image),  width="stretch")
+        st.image(str(image), use_column_width=True)
         st.markdown('<div class="image-credit">Healthy human T lymphocyte, scanning electron micrograph. NIAID/NIH, public domain. Decorative context; not study data.</div>', unsafe_allow_html=True)
 st.write("")
 scope_note()
@@ -84,7 +103,7 @@ with overview_tab:
     with left:
         lobule = ASSETS / "thymus_lobule_nih_bioart.svg"
         if lobule.exists():
-            st.image(str(lobule),  width="stretch")
+            st.image(str(lobule), use_column_width=True)
             st.markdown('<div class="image-credit">Thymus lobule © Human Reference Atlas / NIAID NIH BioArt, CC BY 4.0. Decorative anatomical context; not study data.</div>', unsafe_allow_html=True)
     with right:
         c1, c2 = st.columns(2)
@@ -197,11 +216,7 @@ with contribute_tab:
         for index, name in enumerate(EXPECTED_FILES)
     }
     raw_files = {name: item.getvalue() for name, item in uploaded.items() if item is not None}
-    signature = sha256(b"".join(name.encode() + b"\0" + raw_files[name] for name in sorted(raw_files))).hexdigest()
     session_store = SessionSubmissionStore(st.session_state)
-    previous = session_store.load()
-    if previous and previous["signature"] != signature:
-        session_store.clear()
     manual_map = {}
     if len(raw_files) == len(EXPECTED_FILES) and all(len(raw) <= MAX_FILE_BYTES for raw in raw_files.values()):
         preliminary = validate_submission(raw_files)
@@ -217,8 +232,26 @@ with contribute_tab:
         st.dataframe(preview.mappings, use_container_width=True, hide_index=True)
     else:
         preview = None
+
+    signature = community_submission_signature(raw_files, manual_map)
+    previous = session_store.load()
+    if previous and previous.get("signature") != signature:
+        session_store.clear()
+
     consent = st.checkbox("I confirm that I am authorized to share these files and that they contain no direct identifiers or controlled-access human data.", key="community_consent")
-    if st.button("Validate and prepare submission package", disabled=not consent or len(raw_files) != len(EXPECTED_FILES), type="primary"):
+    has_session_state = bool(raw_files) or consent or session_store.load() is not None or any(
+        key.startswith("map_") for key in st.session_state
+    )
+    action_columns = st.columns([1.4, 1])
+    with action_columns[0]:
+        validate_clicked = st.button("Validate and prepare submission package",
+                                     disabled=not consent or len(raw_files) != len(EXPECTED_FILES),
+                                     type="primary")
+    with action_columns[1]:
+        if has_session_state:
+            st.button("Clear this session's submission", on_click=clear_community_submission_state)
+
+    if validate_clicked:
         submission_id = "CSA-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + uuid4().hex[:8].upper()
         result = validate_submission(raw_files, manual_map)
         session_store.save({"id": submission_id, "signature": signature, "result": result,
@@ -242,7 +275,4 @@ with contribute_tab:
                 st.dataframe(result.tables[name].head(20), use_container_width=True, hide_index=True)
             st.download_button("Download normalized results and validation report", saved["package"],
                                file_name=f"{saved['id']}.zip", mime="application/zip")
-        if st.button("Clear this session's submission"):
-            session_store.clear()
-            st.rerun()
 st.markdown('<div class="footer">Human Thymic Aging Atlas · donor-resolved research resource · <a href="https://github.com/12306-po/Human-Thymic-Aging-Atlas" target="_blank">GitHub source repository</a></div>',unsafe_allow_html=True)

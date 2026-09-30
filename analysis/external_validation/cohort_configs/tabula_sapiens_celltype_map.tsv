@@ -1,0 +1,28 @@
+external_label	broad_cell_type	include	review_status	notes
+B cell	B	TRUE	APPROVED	broad B lineage
+memory B cell	B	TRUE	APPROVED	broad B lineage
+naive B cell	B	TRUE	APPROVED	broad B lineage
+plasma cell	Plasma	TRUE	APPROVED	plasma lineage
+double-positive, alpha-beta thymocyte	DP	TRUE	APPROVED	CD4/CD8 double-positive thymocyte
+CD4-positive, alpha-beta thymocyte	SP_CD4	TRUE	APPROVED	CD4 single-positive thymocyte
+CD8-positive, alpha-beta thymocyte	SP_CD8	TRUE	APPROVED	CD8 single-positive thymocyte
+naive thymus-derived CD4-positive, alpha-beta T cell	SP_CD4	TRUE	APPROVED	mature CD4 lineage
+naive thymus-derived CD8-positive, alpha-beta T cell	SP_CD8	TRUE	APPROVED	mature CD8 lineage
+CD4-positive, alpha-beta T cell	SP_CD4	TRUE	APPROVED	mature CD4 lineage
+CD8-positive, alpha-beta T cell	SP_CD8	TRUE	APPROVED	mature CD8 lineage
+regulatory T cell	Treg	TRUE	APPROVED	regulatory T lineage
+gamma-delta T cell	GammaDelta_T	TRUE	APPROVED	gamma-delta lineage
+natural killer cell	NKT_like	TRUE	APPROVED	captured-library denominator only
+NK T cell	NKT_like	TRUE	APPROVED	captured-library denominator only
+dendritic cell	Myeloid	TRUE	APPROVED	broad myeloid lineage
+myeloid dendritic cell	Myeloid	TRUE	APPROVED	broad myeloid lineage
+plasmacytoid dendritic cell	Myeloid	TRUE	APPROVED	broad myeloid lineage
+monocyte	Myeloid	TRUE	APPROVED	broad myeloid lineage
+macrophage	Myeloid	TRUE	APPROVED	broad myeloid lineage
+fibroblast	Fibroblast	TRUE	APPROVED	stromal lineage
+endothelial cell	Endothelial	TRUE	APPROVED	stromal lineage
+epithelial cell	TEC	TRUE	APPROVED	thymic epithelial context
+erythrocyte	Ery	TRUE	APPROVED	captured-library denominator only
+platelet	Unknown	FALSE	APPROVED	not represented in primary broad-cell schema
+T cell	Unknown	FALSE	APPROVED	insufficiently specific for a primary-model context
+thymocyte	Unknown	FALSE	APPROVED	insufficiently specific for a primary-model context

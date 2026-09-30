@@ -1,0 +1,11 @@
+external_label	broad_cell_type	include	review_status	notes
+cTEC	TEC	TRUE	APPROVED	cortical thymic epithelial cell
+mTEC	TEC	TRUE	APPROVED	medullary thymic epithelial cell
+TEC	TEC	TRUE	APPROVED	thymic epithelial cell
+Fibroblast	Fibroblast	TRUE	APPROVED	fibroblast
+fibroblast	Fibroblast	TRUE	APPROVED	fibroblast
+Endothelial	Endothelial	TRUE	APPROVED	stromal context; no selected primary feature
+endothelial	Endothelial	TRUE	APPROVED	stromal context; no selected primary feature
+Myoid	Unknown	FALSE	APPROVED	not represented in primary broad-cell schema
+Neuroendocrine	Unknown	FALSE	APPROVED	not represented in primary broad-cell schema
+Mesothelial	Unknown	FALSE	APPROVED	not represented in primary broad-cell schema

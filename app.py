@@ -4,6 +4,12 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from datetime import datetime, timezone
+from hashlib import sha256
+from uuid import uuid4
+
+from community_submission import ALLOWED_CELL_TYPES, MAX_FILE_BYTES, EXPECTED_FILES, make_download_package, validate_submission
+from submission_store import SessionSubmissionStore
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "release" / "data"
 MANIFEST = ROOT / "release" / "manifest"
@@ -65,12 +71,12 @@ with hero_left:
 with hero_right:
     image = ASSETS / "healthy_human_t_cell.jpg"
     if image.exists():
-        st.image(str(image), width="stretch")
+        st.image(str(image), use_column_width=True)
         st.markdown('<div class="image-credit">Healthy human T lymphocyte, scanning electron micrograph. NIAID/NIH, public domain. Decorative context; not study data.</div>', unsafe_allow_html=True)
 st.write("")
 scope_note()
 st.write("")
-overview_tab, gene_tab, cell_tab, donor_tab, download_tab = st.tabs(["Overview", "Gene explorer", "Cell-type explorer", "Donor explorer", "Downloads & provenance"])
+overview_tab, gene_tab, cell_tab, donor_tab, download_tab, contribute_tab = st.tabs(["Overview", "Gene explorer", "Cell-type explorer", "Donor explorer", "Downloads & provenance", "Contribute data"])
 with overview_tab:
     st.markdown('<div class="section-label">Resource architecture</div>', unsafe_allow_html=True)
     st.subheader("From organ context to donor-resolved evidence")
@@ -78,7 +84,7 @@ with overview_tab:
     with left:
         lobule = ASSETS / "thymus_lobule_nih_bioart.svg"
         if lobule.exists():
-            st.image(str(lobule), width="stretch")
+            st.image(str(lobule), use_column_width=True)
             st.markdown('<div class="image-credit">Thymus lobule © Human Reference Atlas / NIAID NIH BioArt, CC BY 4.0. Decorative anatomical context; not study data.</div>', unsafe_allow_html=True)
     with right:
         c1, c2 = st.columns(2)
@@ -174,4 +180,69 @@ with download_tab:
     downloadable=sorted(DATA.glob("*"))+sorted(MANIFEST.glob("*"))+sorted((ROOT/"release"/"source_files").glob("*"))+sorted((ROOT/"release"/"figures").glob("*")); columns=st.columns(3)
     for i,path in enumerate(downloadable): columns[i%3].download_button(label=f"Download {path.name}",data=path.read_bytes(),file_name=path.name,mime="application/octet-stream",key=f"download_{path.name}")
     st.markdown("#### Image credits"); st.markdown("- **Healthy Human T Cell** — NIAID/NIH, public domain, via Wikimedia Commons.\n- **Thymus Lobule** — Human Reference Atlas / NIAID NIH BioArt, CC BY 4.0, via Wikimedia Commons.\n\nBoth images are visual context only; neither is a result from this study.")
+with contribute_tab:
+    st.markdown('<div class="section-label">Community datasets · session-only preview</div>', unsafe_allow_html=True)
+    st.subheader("Contribute standardized results")
+    st.info("This page validates and packages a dataset in your current browser session. It does not send data to the maintainers, save a server copy, or change the official v1.0-18donor Atlas.")
+    st.warning("Upload only de-identified, shareable summary data. Do not upload controlled-access human data, names, dates of birth, contact details, clinical records, FASTQ, H5AD, or raw sequencing files. A checkbox cannot verify de-identification.")
+    st.markdown("Use the three templates below; field definitions are in `schemas/README.md`. Each file is limited to 10 MiB and 200,000 rows.")
+    template_columns = st.columns(3)
+    for index, name in enumerate(EXPECTED_FILES):
+        template = ROOT / "schemas" / f"community_{name.removesuffix('.csv')}_template.csv"
+        template_columns[index].download_button(f"Download {name} template", template.read_bytes(),
+                                                file_name=name, mime="text/csv", key=f"template_{name}")
+    upload_columns = st.columns(3)
+    uploaded = {
+        name: upload_columns[index].file_uploader(name, type=["csv"], key=f"community_{name}")
+        for index, name in enumerate(EXPECTED_FILES)
+    }
+    raw_files = {name: item.getvalue() for name, item in uploaded.items() if item is not None}
+    signature = sha256(b"".join(name.encode() + b"\0" + raw_files[name] for name in sorted(raw_files))).hexdigest()
+    session_store = SessionSubmissionStore(st.session_state)
+    previous = session_store.load()
+    if previous and previous["signature"] != signature:
+        session_store.clear()
+    manual_map = {}
+    if len(raw_files) == len(EXPECTED_FILES) and all(len(raw) <= MAX_FILE_BYTES for raw in raw_files.values()):
+        preliminary = validate_submission(raw_files)
+        unresolved = preliminary.mappings.loc[preliminary.mappings["mapped_label"].eq(""), "submitted_label"].tolist()
+        if unresolved:
+            st.markdown("#### Resolve cell-type labels")
+            st.caption("Map only biologically equivalent labels. If no equivalent exists, revise your CSV or discuss it during manual review.")
+            for label in unresolved:
+                manual_map[label] = st.selectbox(f"Map {label}", ["Select a label", *ALLOWED_CELL_TYPES, "whole_thymus"], key=f"map_{label}")
+            manual_map = {label: target for label, target in manual_map.items() if target != "Select a label"}
+        st.markdown("#### Cell-type mapping preview")
+        preview = validate_submission(raw_files, manual_map)
+        st.dataframe(preview.mappings, use_container_width=True, hide_index=True)
+    else:
+        preview = None
+    consent = st.checkbox("I confirm that I am authorized to share these files and that they contain no direct identifiers or controlled-access human data.", key="community_consent")
+    if st.button("Validate and prepare submission package", disabled=not consent or len(raw_files) != len(EXPECTED_FILES), type="primary"):
+        submission_id = "CSA-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + uuid4().hex[:8].upper()
+        result = validate_submission(raw_files, manual_map)
+        session_store.save({"id": submission_id, "signature": signature, "result": result,
+                            "package": make_download_package(submission_id, result) if result.valid else None})
+    saved = session_store.load()
+    if saved:
+        result = saved["result"]
+        st.markdown("#### Validation report")
+        st.write(f"Submission ID: **{saved['id']}**")
+        st.write("**Submitted (this session) → Automated validation → " +
+                 ("Pending manual review (package ready; not delivered)" if result.valid else "Needs correction" ) + "**")
+        st.json(result.summary)
+        if result.issues:
+            st.dataframe(pd.DataFrame(result.issues), use_container_width=True, hide_index=True)
+        else:
+            st.success("All automated checks passed. Human review is still required before any community listing.")
+        if result.valid:
+            st.markdown("#### Normalized preview")
+            for name in EXPECTED_FILES:
+                st.caption(name)
+                st.dataframe(result.tables[name].head(20), use_container_width=True, hide_index=True)
+            st.download_button("Download normalized results and validation report", saved["package"],
+                               file_name=f"{saved['id']}.zip", mime="application/zip")
+        if st.button("Clear this session's submission"):
+            session_store.clear()
+            st.rerun()
 st.markdown('<div class="footer">Human Thymic Aging Atlas · donor-resolved research resource · <a href="https://github.com/12306-po/Human-Thymic-Aging-Atlas" target="_blank">GitHub source repository</a></div>',unsafe_allow_html=True)

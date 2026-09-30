@@ -8,6 +8,7 @@ An interactive, donor-resolved results atlas for continuous-age analyses of the 
 - **Cell-type explorer** — composition associations, donor coverage, age-up/down genes, pathway overlap and top predictors.
 - **Donor explorer** — age, sex, QC, captured-library composition, out-of-fold prediction and age-adjusted deviation.
 - **Downloads and provenance** — release tables, source workbooks, manifests and SHA-256 checksums.
+- **Contribute data** — session-only CSV validation, cell-type mapping preview and a downloadable review package; no automatic publication.
 
 ## Scope and evidence boundaries
 
@@ -18,17 +19,28 @@ An interactive, donor-resolved results atlas for continuous-age analyses of the 
 - GSE195812 provides developmental localization, not independent aging validation.
 - Mouse results provide cross-dataset directional support, not external validation of the human model.
 
+## Three evidence layers
+
+- **Official Atlas:** frozen `v1.0-18donor` manuscript release. Community files cannot modify `release/` or D-010 main results.
+- **External evidence:** separately audited transfer or support. HRA007984 remains supplementary feasibility work, with no external prediction result in this release.
+- **Community datasets:** contributor-supplied standardized results. The v1 page only validates and exports a package in the browser session; inclusion requires later human review and a new curated version.
+
+See [Community Submission v1](docs/COMMUNITY_SUBMISSIONS.md) and the [CSV field guide](schemas/README.md). Do not upload controlled-access human data or direct identifiers. There is no server-side submission inbox yet.
+
 ## Repository layout
 
 ```text
 .
 ├── app.py
+├── community_submission.py
+├── submission_store.py
 ├── build_atlas.py
 ├── export_server_inputs.py
 ├── analysis/pipeline/
 ├── analysis/external_validation/
 ├── analysis/publication_figures_v3/
 ├── docs/MANUSCRIPT_CODE_MAP.md
+├── docs/COMMUNITY_SUBMISSIONS.md
 ├── assets/
 ├── release/data/
 ├── release/source_files/
@@ -45,6 +57,12 @@ streamlit run app.py
 ```
 
 On Windows, `run_atlas.ps1` also locates a configured Python installation and launches the app.
+
+Community Submission v1 needs no additional environment variables. It has no
+database or object-storage connection. Uploaded bytes and validation output
+exist only in the Streamlit session; download the package before leaving the
+page. Configure a separate, reviewed persistence service before advertising
+this as an actual server intake channel.
 
 ## Rebuild the release
 

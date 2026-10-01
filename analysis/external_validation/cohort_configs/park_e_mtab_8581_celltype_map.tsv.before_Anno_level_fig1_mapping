@@ -1,0 +1,17 @@
+external_label	broad_cell_type	include	review_status	notes
+DP	DP	TRUE	APPROVED	double-positive thymocyte
+DP(P)	DP	TRUE	APPROVED	proliferating double-positive thymocyte
+DP(Q)	DP	TRUE	APPROVED	quiescent double-positive thymocyte
+CD4+ T	SP_CD4	TRUE	APPROVED	CD4 lineage
+CD8+ T	SP_CD8	TRUE	APPROVED	CD8 lineage
+Treg	Treg	TRUE	APPROVED	regulatory T lineage
+DN	DN	TRUE	APPROVED	double-negative thymocyte
+gdT	GammaDelta_T	TRUE	APPROVED	gamma-delta lineage
+B	B	TRUE	APPROVED	B lineage
+Plasma	Plasma	TRUE	APPROVED	plasma lineage
+TEC	TEC	TRUE	APPROVED	thymic epithelial lineage
+Fibroblast	Fibroblast	TRUE	APPROVED	stromal lineage
+Endothelial	Endothelial	TRUE	APPROVED	stromal lineage
+Myeloid	Myeloid	TRUE	APPROVED	broad myeloid lineage
+DC	Myeloid	TRUE	APPROVED	dendritic lineage
+NKT	NKT_like	TRUE	APPROVED	captured-library denominator only

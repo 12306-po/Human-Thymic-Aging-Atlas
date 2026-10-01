@@ -1,0 +1,4 @@
+cohort	external_donor_id	donor_id	age_type	age_years	age_lower	age_upper	sex	health	include	review_status	source_url
+Park E-MTAB-8581	A16	PARK_A16	interval		20	25	Female	normal	TRUE	APPROVED	https://zenodo.org/records/3711134
+Park E-MTAB-8581	A43	PARK_A43	interval		35	40	Male	normal	TRUE	APPROVED	https://zenodo.org/records/3711134
+Park E-MTAB-8581	A45	PARK_A45	interval		15	20	Male	normal	FALSE	EXCLUDED_NO_CONFIRMED_LIBRARY	https://zenodo.org/records/3711134

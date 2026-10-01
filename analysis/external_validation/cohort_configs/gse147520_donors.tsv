@@ -1,0 +1,2 @@
+cohort	external_donor_id	donor_id	age_type	age_years	age_lower	age_upper	sex	health	include	review_status	source_url
+GSE147520	Adult	GSE147520_ADULT25	exact	25			unknown	normal adult thymic stromal sample	TRUE	APPROVED	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE147520

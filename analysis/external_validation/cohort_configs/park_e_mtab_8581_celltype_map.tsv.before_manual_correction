@@ -1,0 +1,43 @@
+external_label	broad_cell_type	include	review_status	notes
+B_memory	B	TRUE	APPROVED	B-cell lineage
+B_naive	B	TRUE	APPROVED	B-cell lineage
+B_plasma	B	TRUE	APPROVED	B-cell lineage
+B_pro/pre	B	TRUE	APPROVED	B-cell lineage
+CD4+T	SP_CD4	TRUE	APPROVED	CD4 single-positive lineage
+CD4+Tmem	SP_CD4	TRUE	APPROVED	CD4 single-positive lineage
+CD8+T	SP_CD8	TRUE	APPROVED	CD8 single-positive lineage
+CD8+Tmem	SP_CD8	TRUE	APPROVED	CD8 single-positive lineage
+CD8αα	NKT_like	TRUE	APPROVED	innate-like T lineage
+DC1	DC	TRUE	APPROVED	dendritic lineage
+DC2	DC	TRUE	APPROVED	dendritic lineage
+DN	DN	TRUE	APPROVED	double-negative/early thymocyte
+DP	DP	TRUE	APPROVED	double-positive thymocyte
+ETP	DN	TRUE	APPROVED	double-negative/early thymocyte
+Endo	Endothelial	TRUE	APPROVED	endothelial lineage
+Ery	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+Fb_1	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+Fb_2	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+Fb_cycling	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+ILC3	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+Lymph	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+Mac	Macrophage	TRUE	APPROVED	macrophage lineage
+Mast	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+Mono	Monocyte	TRUE	APPROVED	monocyte lineage
+NK	NK	TRUE	APPROVED	natural-killer lineage
+NKT	NKT_like	TRUE	APPROVED	innate-like T lineage
+NMP	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+T(agonist)	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+TEC(myo)	TEC	TRUE	APPROVED	thymic epithelial lineage
+TEC(neuro)	TEC	TRUE	APPROVED	thymic epithelial lineage
+Treg	Treg	TRUE	APPROVED	regulatory T lineage
+VSMC	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+aDC	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+cTEC	TEC	TRUE	APPROVED	thymic epithelial lineage
+mTEC(I)	TEC	TRUE	APPROVED	thymic epithelial lineage
+mTEC(II)	TEC	TRUE	APPROVED	thymic epithelial lineage
+mTEC(III)	TEC	TRUE	APPROVED	thymic epithelial lineage
+mTEC(IV)	TEC	TRUE	APPROVED	thymic epithelial lineage
+mcTEC	TEC	TRUE	APPROVED	thymic epithelial lineage
+pDC	DC	TRUE	APPROVED	dendritic lineage
+αβT(entry)	Unknown	FALSE	APPROVED	conservative exclusion: no unambiguous primary-model counterpart
+γδT	GammaDelta_T	TRUE	APPROVED	gamma-delta T lineage

@@ -1,0 +1,12 @@
+# HumanThymusFormer 深度学习复现环境依赖
+# 与 requirements.txt（Streamlit 网站运行环境）分离：
+# 本文件用于在分析服务器上复现 Step 13 / 14 / 14b / 15。
+# 建议 Python 3.9+；固定 SEED=371 后 CPU 复现确定。
+
+torch>=2.0
+captum>=0.6
+scikit-learn>=1.3
+scipy>=1.10
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7

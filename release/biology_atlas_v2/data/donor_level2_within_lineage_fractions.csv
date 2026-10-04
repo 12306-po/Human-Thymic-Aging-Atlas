@@ -1,0 +1,307 @@
+donor_id,family,atlas_level2,n_cells,lineage_denominator,within_lineage_fraction,age_years,sex
+donor1,T lineage,Early DN-like,5,3604,0.0013873473917869034,56.0,Female
+donor2,T lineage,Early DN-like,304,6292,0.04831532104259377,48.0,Female
+donor3,T lineage,Early DN-like,522,5012,0.10415003990422984,24.0,Female
+donor4,T lineage,Early DN-like,493,8940,0.05514541387024609,5.0,Female
+donor5,T lineage,Early DN-like,513,6653,0.07710807154667068,12.0,Female
+donor6,T lineage,Early DN-like,424,8020,0.05286783042394015,35.0,Female
+donor7,T lineage,Early DN-like,161,5699,0.028250570275486928,56.0,Female
+donor8,T lineage,Early DN-like,112,4475,0.025027932960893853,35.0,Female
+donor9,T lineage,Early DN-like,139,3167,0.04389011682980739,24.0,Female
+donor10,T lineage,Early DN-like,68,2461,0.02763104429093864,35.0,Female
+donor11,T lineage,Early DN-like,529,6185,0.08552950687146321,9.0,Male
+donor12,T lineage,Early DN-like,149,4177,0.03567153459420637,22.0,Male
+donor13,T lineage,Early DN-like,239,6026,0.039661466976435446,4.0,Female
+donor14,T lineage,Early DN-like,134,4057,0.03302933201873305,69.0,Male
+donor15,T lineage,Early DN-like,233,4186,0.055661729574773056,53.0,Male
+donor16,T lineage,Early DN-like,179,5100,0.03509803921568627,46.0,Female
+donor17,T lineage,Early DN-like,278,5138,0.0541066562864928,21.0,Female
+donor18,T lineage,Early DN-like,731,8378,0.08725232752446885,64.0,Female
+donor1,T lineage,Cycling DN,0,3604,0.0,56.0,Female
+donor2,T lineage,Cycling DN,71,6292,0.011284170375079465,48.0,Female
+donor3,T lineage,Cycling DN,109,5012,0.02174780526735834,24.0,Female
+donor4,T lineage,Cycling DN,112,8940,0.012527964205816556,5.0,Female
+donor5,T lineage,Cycling DN,221,6653,0.03321809709905306,12.0,Female
+donor6,T lineage,Cycling DN,143,8020,0.017830423940149626,35.0,Female
+donor7,T lineage,Cycling DN,27,5699,0.004737673276013336,56.0,Female
+donor8,T lineage,Cycling DN,48,4475,0.010726256983240224,35.0,Female
+donor9,T lineage,Cycling DN,31,3167,0.009788443321755604,24.0,Female
+donor10,T lineage,Cycling DN,14,2461,0.005688744412840309,35.0,Female
+donor11,T lineage,Cycling DN,258,6185,0.04171382376717866,9.0,Male
+donor12,T lineage,Cycling DN,45,4177,0.010773282259995211,22.0,Male
+donor13,T lineage,Cycling DN,55,6026,0.009127115831397279,4.0,Female
+donor14,T lineage,Cycling DN,20,4057,0.004929751047572098,69.0,Male
+donor15,T lineage,Cycling DN,58,4186,0.01385570950788342,53.0,Male
+donor16,T lineage,Cycling DN,42,5100,0.00823529411764706,46.0,Female
+donor17,T lineage,Cycling DN,88,5138,0.017127286882055275,21.0,Female
+donor18,T lineage,Cycling DN,161,8378,0.01921699689663404,64.0,Female
+donor1,T lineage,ISP-like,0,3604,0.0,56.0,Female
+donor2,T lineage,ISP-like,13,6292,0.002066115702479339,48.0,Female
+donor3,T lineage,ISP-like,7,5012,0.0013966480446927375,24.0,Female
+donor4,T lineage,ISP-like,31,8940,0.003467561521252796,5.0,Female
+donor5,T lineage,ISP-like,21,6653,0.0031564707650683903,12.0,Female
+donor6,T lineage,ISP-like,11,8020,0.001371571072319202,35.0,Female
+donor7,T lineage,ISP-like,7,5699,0.0012282856641516056,56.0,Female
+donor8,T lineage,ISP-like,3,4475,0.000670391061452514,35.0,Female
+donor9,T lineage,ISP-like,2,3167,0.0006315124723713293,24.0,Female
+donor10,T lineage,ISP-like,1,2461,0.0004063388866314506,35.0,Female
+donor11,T lineage,ISP-like,14,6185,0.0022635408245755863,9.0,Male
+donor12,T lineage,ISP-like,7,4177,0.0016758439071103662,22.0,Male
+donor13,T lineage,ISP-like,12,6026,0.0019913707268503153,4.0,Female
+donor14,T lineage,ISP-like,11,4057,0.0027113630761646536,69.0,Male
+donor15,T lineage,ISP-like,30,4186,0.00716674629718108,53.0,Male
+donor16,T lineage,ISP-like,6,5100,0.001176470588235294,46.0,Female
+donor17,T lineage,ISP-like,12,5138,0.0023355391202802647,21.0,Female
+donor18,T lineage,ISP-like,4,8378,0.00047744091668656003,64.0,Female
+donor1,T lineage,Alpha-beta entry,0,3604,0.0,56.0,Female
+donor2,T lineage,Alpha-beta entry,367,6292,0.05832803560076287,48.0,Female
+donor3,T lineage,Alpha-beta entry,271,5012,0.05407023144453312,24.0,Female
+donor4,T lineage,Alpha-beta entry,496,8940,0.05548098434004474,5.0,Female
+donor5,T lineage,Alpha-beta entry,319,6653,0.04794829400270555,12.0,Female
+donor6,T lineage,Alpha-beta entry,384,8020,0.047880299251870324,35.0,Female
+donor7,T lineage,Alpha-beta entry,304,5699,0.053342691700298296,56.0,Female
+donor8,T lineage,Alpha-beta entry,225,4475,0.05027932960893855,35.0,Female
+donor9,T lineage,Alpha-beta entry,172,3167,0.05431007262393432,24.0,Female
+donor10,T lineage,Alpha-beta entry,175,2461,0.07110930516050386,35.0,Female
+donor11,T lineage,Alpha-beta entry,352,6185,0.05691188358932902,9.0,Male
+donor12,T lineage,Alpha-beta entry,252,4177,0.06033038065597319,22.0,Male
+donor13,T lineage,Alpha-beta entry,371,6026,0.061566544971788914,4.0,Female
+donor14,T lineage,Alpha-beta entry,127,4057,0.03130391915208282,69.0,Male
+donor15,T lineage,Alpha-beta entry,222,4186,0.05303392259913999,53.0,Male
+donor16,T lineage,Alpha-beta entry,231,5100,0.045294117647058825,46.0,Female
+donor17,T lineage,Alpha-beta entry,262,5138,0.05099260412611911,21.0,Female
+donor18,T lineage,Alpha-beta entry,355,8378,0.0423728813559322,64.0,Female
+donor1,T lineage,Cycling DP,11,3604,0.0030521642619311877,56.0,Female
+donor2,T lineage,Cycling DP,691,6292,0.10982199618563256,48.0,Female
+donor3,T lineage,Cycling DP,798,5012,0.15921787709497207,24.0,Female
+donor4,T lineage,Cycling DP,1392,8940,0.15570469798657718,5.0,Female
+donor5,T lineage,Cycling DP,903,6653,0.13572824289794078,12.0,Female
+donor6,T lineage,Cycling DP,1505,8020,0.18765586034912718,35.0,Female
+donor7,T lineage,Cycling DP,828,5699,0.14528864713107562,56.0,Female
+donor8,T lineage,Cycling DP,643,4475,0.14368715083798883,35.0,Female
+donor9,T lineage,Cycling DP,256,3167,0.08083359646353015,24.0,Female
+donor10,T lineage,Cycling DP,242,2461,0.09833401056481106,35.0,Female
+donor11,T lineage,Cycling DP,1024,6185,0.16556184316895717,9.0,Male
+donor12,T lineage,Cycling DP,602,4177,0.1441225760114915,22.0,Male
+donor13,T lineage,Cycling DP,960,6026,0.15930965814802522,4.0,Female
+donor14,T lineage,Cycling DP,126,4057,0.031057431599704213,69.0,Male
+donor15,T lineage,Cycling DP,502,4186,0.11992355470616341,53.0,Male
+donor16,T lineage,Cycling DP,714,5100,0.14,46.0,Female
+donor17,T lineage,Cycling DP,889,5138,0.17302452316076294,21.0,Female
+donor18,T lineage,Cycling DP,1077,8378,0.1285509668178563,64.0,Female
+donor1,T lineage,Quiescent DP,102,3604,0.02830188679245283,56.0,Female
+donor2,T lineage,Quiescent DP,2689,6292,0.42736808645899554,48.0,Female
+donor3,T lineage,Quiescent DP,1767,5012,0.3525538707102953,24.0,Female
+donor4,T lineage,Quiescent DP,4777,8940,0.5343400447427293,5.0,Female
+donor5,T lineage,Quiescent DP,3349,6653,0.5033819329625733,12.0,Female
+donor6,T lineage,Quiescent DP,4281,8020,0.5337905236907731,35.0,Female
+donor7,T lineage,Quiescent DP,2979,5699,0.5227232847868047,56.0,Female
+donor8,T lineage,Quiescent DP,2214,4475,0.4947486033519553,35.0,Female
+donor9,T lineage,Quiescent DP,1335,3167,0.4215345753078623,24.0,Female
+donor10,T lineage,Quiescent DP,1418,2461,0.576188541243397,35.0,Female
+donor11,T lineage,Quiescent DP,3135,6185,0.5068714632174616,9.0,Male
+donor12,T lineage,Quiescent DP,2198,4177,0.526214986832655,22.0,Male
+donor13,T lineage,Quiescent DP,3410,6026,0.5658811815466313,4.0,Female
+donor14,T lineage,Quiescent DP,617,4057,0.15208281981759922,69.0,Male
+donor15,T lineage,Quiescent DP,2430,4186,0.5805064500716675,53.0,Male
+donor16,T lineage,Quiescent DP,2675,5100,0.5245098039215687,46.0,Female
+donor17,T lineage,Quiescent DP,2954,5138,0.5749318801089919,21.0,Female
+donor18,T lineage,Quiescent DP,4399,8378,0.5250656481260444,64.0,Female
+donor1,T lineage,HSP-associated DP,8,3604,0.0022197558268590455,56.0,Female
+donor2,T lineage,HSP-associated DP,22,6292,0.0034965034965034965,48.0,Female
+donor3,T lineage,HSP-associated DP,517,5012,0.10315243415802075,24.0,Female
+donor4,T lineage,HSP-associated DP,370,8940,0.04138702460850112,5.0,Female
+donor5,T lineage,HSP-associated DP,162,6653,0.024349917330527583,12.0,Female
+donor6,T lineage,HSP-associated DP,30,8020,0.003740648379052369,35.0,Female
+donor7,T lineage,HSP-associated DP,42,5699,0.007369713984909633,56.0,Female
+donor8,T lineage,HSP-associated DP,43,4475,0.009608938547486033,35.0,Female
+donor9,T lineage,HSP-associated DP,19,3167,0.005999368487527629,24.0,Female
+donor10,T lineage,HSP-associated DP,2,2461,0.0008126777732629012,35.0,Female
+donor11,T lineage,HSP-associated DP,16,6185,0.0025869037995149557,9.0,Male
+donor12,T lineage,HSP-associated DP,7,4177,0.0016758439071103662,22.0,Male
+donor13,T lineage,HSP-associated DP,9,6026,0.0014935280451377365,4.0,Female
+donor14,T lineage,HSP-associated DP,2,4057,0.0004929751047572097,69.0,Male
+donor15,T lineage,HSP-associated DP,8,4186,0.0019111323459149545,53.0,Male
+donor16,T lineage,HSP-associated DP,16,5100,0.003137254901960784,46.0,Female
+donor17,T lineage,HSP-associated DP,12,5138,0.0023355391202802647,21.0,Female
+donor18,T lineage,HSP-associated DP,18,8378,0.0021484841250895203,64.0,Female
+donor1,T lineage,CD4 SP,1850,3604,0.5133185349611543,56.0,Female
+donor2,T lineage,CD4 SP,913,6292,0.1451048951048951,48.0,Female
+donor3,T lineage,CD4 SP,324,5012,0.06464485235434957,24.0,Female
+donor4,T lineage,CD4 SP,431,8940,0.04821029082774049,5.0,Female
+donor5,T lineage,CD4 SP,396,6653,0.05952202014128964,12.0,Female
+donor6,T lineage,CD4 SP,337,8020,0.04201995012468828,35.0,Female
+donor7,T lineage,CD4 SP,492,5699,0.08633093525179857,56.0,Female
+donor8,T lineage,CD4 SP,413,4475,0.09229050279329609,35.0,Female
+donor9,T lineage,CD4 SP,394,3167,0.12440795705715188,24.0,Female
+donor10,T lineage,CD4 SP,171,2461,0.06948394961397805,35.0,Female
+donor11,T lineage,CD4 SP,234,6185,0.037833468067906224,9.0,Male
+donor12,T lineage,CD4 SP,250,4177,0.05985156811108451,22.0,Male
+donor13,T lineage,CD4 SP,258,6026,0.04281447062728178,4.0,Female
+donor14,T lineage,CD4 SP,1277,4057,0.31476460438747844,69.0,Male
+donor15,T lineage,CD4 SP,188,4186,0.04491161012900143,53.0,Male
+donor16,T lineage,CD4 SP,386,5100,0.07568627450980392,46.0,Female
+donor17,T lineage,CD4 SP,206,5138,0.04009342156481121,21.0,Female
+donor18,T lineage,CD4 SP,450,8378,0.053712103127238,64.0,Female
+donor1,T lineage,CD8 SP,929,3604,0.25776914539400664,56.0,Female
+donor2,T lineage,CD8 SP,408,6292,0.06484424666242848,48.0,Female
+donor3,T lineage,CD8 SP,260,5012,0.05187549880287311,24.0,Female
+donor4,T lineage,CD8 SP,258,8940,0.028859060402684565,5.0,Female
+donor5,T lineage,CD8 SP,169,6653,0.025402074252217046,12.0,Female
+donor6,T lineage,CD8 SP,370,8020,0.046134663341645885,35.0,Female
+donor7,T lineage,CD8 SP,405,5699,0.07106509914020004,56.0,Female
+donor8,T lineage,CD8 SP,320,4475,0.07150837988826815,35.0,Female
+donor9,T lineage,CD8 SP,330,3167,0.10419955794126934,24.0,Female
+donor10,T lineage,CD8 SP,127,2461,0.05160503860219423,35.0,Female
+donor11,T lineage,CD8 SP,141,6185,0.022797089733225546,9.0,Male
+donor12,T lineage,CD8 SP,315,4177,0.07541297581996648,22.0,Male
+donor13,T lineage,CD8 SP,200,6026,0.03318951211417192,4.0,Female
+donor14,T lineage,CD8 SP,1020,4057,0.25141730342617696,69.0,Male
+donor15,T lineage,CD8 SP,165,4186,0.039417104634495936,53.0,Male
+donor16,T lineage,CD8 SP,288,5100,0.05647058823529412,46.0,Female
+donor17,T lineage,CD8 SP,94,5138,0.018295056442195406,21.0,Female
+donor18,T lineage,CD8 SP,507,8378,0.06051563619002148,64.0,Female
+donor1,T lineage,Treg and agonist,585,3604,0.1623196448390677,56.0,Female
+donor2,T lineage,Treg and agonist,624,6292,0.09917355371900827,48.0,Female
+donor3,T lineage,Treg and agonist,377,5012,0.075219473264166,24.0,Female
+donor4,T lineage,Treg and agonist,529,8940,0.05917225950782998,5.0,Female
+donor5,T lineage,Treg and agonist,440,6653,0.06613557793476627,12.0,Female
+donor6,T lineage,Treg and agonist,443,8020,0.055236907730673315,35.0,Female
+donor7,T lineage,Treg and agonist,408,5699,0.0715915072819793,56.0,Female
+donor8,T lineage,Treg and agonist,406,4475,0.09072625698324022,35.0,Female
+donor9,T lineage,Treg and agonist,419,3167,0.1323018629617935,24.0,Female
+donor10,T lineage,Treg and agonist,223,2461,0.09061357171881348,35.0,Female
+donor11,T lineage,Treg and agonist,396,6185,0.06402586903799515,9.0,Male
+donor12,T lineage,Treg and agonist,318,4177,0.0761311946372995,22.0,Male
+donor13,T lineage,Treg and agonist,462,6026,0.07666777298373714,4.0,Female
+donor14,T lineage,Treg and agonist,574,4057,0.14148385506531921,69.0,Male
+donor15,T lineage,Treg and agonist,234,4186,0.055900621118012424,53.0,Male
+donor16,T lineage,Treg and agonist,384,5100,0.07529411764705882,46.0,Female
+donor17,T lineage,Treg and agonist,283,5138,0.05507979758660957,21.0,Female
+donor18,T lineage,Treg and agonist,532,8378,0.06349964191931248,64.0,Female
+donor1,T lineage,Gamma-delta NKT and NK,114,3604,0.031631520532741396,56.0,Female
+donor2,T lineage,Gamma-delta NKT and NK,190,6292,0.030197075651621105,48.0,Female
+donor3,T lineage,Gamma-delta NKT and NK,60,5012,0.011971268954509178,24.0,Female
+donor4,T lineage,Gamma-delta NKT and NK,51,8940,0.005704697986577181,5.0,Female
+donor5,T lineage,Gamma-delta NKT and NK,160,6653,0.024049301067187733,12.0,Female
+donor6,T lineage,Gamma-delta NKT and NK,92,8020,0.011471321695760598,35.0,Female
+donor7,T lineage,Gamma-delta NKT and NK,46,5699,0.00807159150728198,56.0,Female
+donor8,T lineage,Gamma-delta NKT and NK,48,4475,0.010726256983240224,35.0,Female
+donor9,T lineage,Gamma-delta NKT and NK,70,3167,0.022102936532996525,24.0,Female
+donor10,T lineage,Gamma-delta NKT and NK,20,2461,0.008126777732629013,35.0,Female
+donor11,T lineage,Gamma-delta NKT and NK,86,6185,0.013904607922392885,9.0,Male
+donor12,T lineage,Gamma-delta NKT and NK,34,4177,0.008139813263107493,22.0,Male
+donor13,T lineage,Gamma-delta NKT and NK,50,6026,0.00829737802854298,4.0,Female
+donor14,T lineage,Gamma-delta NKT and NK,149,4057,0.03672664530441213,69.0,Male
+donor15,T lineage,Gamma-delta NKT and NK,116,4186,0.02771141901576684,53.0,Male
+donor16,T lineage,Gamma-delta NKT and NK,179,5100,0.03509803921568627,46.0,Female
+donor17,T lineage,Gamma-delta NKT and NK,60,5138,0.011677695601401323,21.0,Female
+donor18,T lineage,Gamma-delta NKT and NK,144,8378,0.017187873000716163,64.0,Female
+donor1,TEC,cTEC,0,0,,56.0,Female
+donor2,TEC,cTEC,9,15,0.6,48.0,Female
+donor3,TEC,cTEC,125,175,0.7142857142857143,24.0,Female
+donor4,TEC,cTEC,128,185,0.6918918918918919,5.0,Female
+donor5,TEC,cTEC,16,46,0.34782608695652173,12.0,Female
+donor6,TEC,cTEC,24,30,0.8,35.0,Female
+donor7,TEC,cTEC,20,115,0.17391304347826086,56.0,Female
+donor8,TEC,cTEC,7,49,0.14285714285714285,35.0,Female
+donor9,TEC,cTEC,1,11,0.09090909090909091,24.0,Female
+donor10,TEC,cTEC,3,24,0.125,35.0,Female
+donor11,TEC,cTEC,53,71,0.7464788732394366,9.0,Male
+donor12,TEC,cTEC,28,48,0.5833333333333334,22.0,Male
+donor13,TEC,cTEC,103,144,0.7152777777777778,4.0,Female
+donor14,TEC,cTEC,4,11,0.36363636363636365,69.0,Male
+donor15,TEC,cTEC,0,1,0.0,53.0,Male
+donor16,TEC,cTEC,6,13,0.46153846153846156,46.0,Female
+donor17,TEC,cTEC,15,32,0.46875,21.0,Female
+donor18,TEC,cTEC,3,22,0.13636363636363635,64.0,Female
+donor1,TEC,mTEC,0,0,,56.0,Female
+donor2,TEC,mTEC,1,15,0.06666666666666667,48.0,Female
+donor3,TEC,mTEC,9,175,0.05142857142857143,24.0,Female
+donor4,TEC,mTEC,3,185,0.016216216216216217,5.0,Female
+donor5,TEC,mTEC,12,46,0.2608695652173913,12.0,Female
+donor6,TEC,mTEC,1,30,0.03333333333333333,35.0,Female
+donor7,TEC,mTEC,28,115,0.24347826086956523,56.0,Female
+donor8,TEC,mTEC,8,49,0.16326530612244897,35.0,Female
+donor9,TEC,mTEC,3,11,0.2727272727272727,24.0,Female
+donor10,TEC,mTEC,4,24,0.16666666666666666,35.0,Female
+donor11,TEC,mTEC,1,71,0.014084507042253521,9.0,Male
+donor12,TEC,mTEC,10,48,0.20833333333333334,22.0,Male
+donor13,TEC,mTEC,7,144,0.04861111111111111,4.0,Female
+donor14,TEC,mTEC,1,11,0.09090909090909091,69.0,Male
+donor15,TEC,mTEC,0,1,0.0,53.0,Male
+donor16,TEC,mTEC,2,13,0.15384615384615385,46.0,Female
+donor17,TEC,mTEC,2,32,0.0625,21.0,Female
+donor18,TEC,mTEC,3,22,0.13636363636363635,64.0,Female
+donor1,TEC,Specialized TEC,0,0,,56.0,Female
+donor2,TEC,Specialized TEC,5,15,0.3333333333333333,48.0,Female
+donor3,TEC,Specialized TEC,41,175,0.2342857142857143,24.0,Female
+donor4,TEC,Specialized TEC,54,185,0.2918918918918919,5.0,Female
+donor5,TEC,Specialized TEC,18,46,0.391304347826087,12.0,Female
+donor6,TEC,Specialized TEC,5,30,0.16666666666666666,35.0,Female
+donor7,TEC,Specialized TEC,67,115,0.5826086956521739,56.0,Female
+donor8,TEC,Specialized TEC,34,49,0.6938775510204082,35.0,Female
+donor9,TEC,Specialized TEC,7,11,0.6363636363636364,24.0,Female
+donor10,TEC,Specialized TEC,17,24,0.7083333333333334,35.0,Female
+donor11,TEC,Specialized TEC,17,71,0.23943661971830985,9.0,Male
+donor12,TEC,Specialized TEC,10,48,0.20833333333333334,22.0,Male
+donor13,TEC,Specialized TEC,34,144,0.2361111111111111,4.0,Female
+donor14,TEC,Specialized TEC,6,11,0.5454545454545454,69.0,Male
+donor15,TEC,Specialized TEC,1,1,1.0,53.0,Male
+donor16,TEC,Specialized TEC,5,13,0.38461538461538464,46.0,Female
+donor17,TEC,Specialized TEC,15,32,0.46875,21.0,Female
+donor18,TEC,Specialized TEC,16,22,0.7272727272727273,64.0,Female
+donor1,Stromal vascular,Fibroblast and VSMC,62,180,0.34444444444444444,56.0,Female
+donor2,Stromal vascular,Fibroblast and VSMC,30,137,0.21897810218978103,48.0,Female
+donor3,Stromal vascular,Fibroblast and VSMC,26,27,0.9629629629629629,24.0,Female
+donor4,Stromal vascular,Fibroblast and VSMC,27,66,0.4090909090909091,5.0,Female
+donor5,Stromal vascular,Fibroblast and VSMC,12,20,0.6,12.0,Female
+donor6,Stromal vascular,Fibroblast and VSMC,95,101,0.9405940594059405,35.0,Female
+donor7,Stromal vascular,Fibroblast and VSMC,344,351,0.98005698005698,56.0,Female
+donor8,Stromal vascular,Fibroblast and VSMC,139,141,0.9858156028368794,35.0,Female
+donor9,Stromal vascular,Fibroblast and VSMC,105,107,0.9813084112149533,24.0,Female
+donor10,Stromal vascular,Fibroblast and VSMC,4,4,1.0,35.0,Female
+donor11,Stromal vascular,Fibroblast and VSMC,60,62,0.967741935483871,9.0,Male
+donor12,Stromal vascular,Fibroblast and VSMC,15,151,0.09933774834437085,22.0,Male
+donor13,Stromal vascular,Fibroblast and VSMC,8,10,0.8,4.0,Female
+donor14,Stromal vascular,Fibroblast and VSMC,431,534,0.8071161048689138,69.0,Male
+donor15,Stromal vascular,Fibroblast and VSMC,308,314,0.9808917197452229,53.0,Male
+donor16,Stromal vascular,Fibroblast and VSMC,477,518,0.9208494208494209,46.0,Female
+donor17,Stromal vascular,Fibroblast and VSMC,6,6,1.0,21.0,Female
+donor18,Stromal vascular,Fibroblast and VSMC,818,853,0.958968347010551,64.0,Female
+donor1,Stromal vascular,Endothelial,118,180,0.6555555555555556,56.0,Female
+donor2,Stromal vascular,Endothelial,107,137,0.781021897810219,48.0,Female
+donor3,Stromal vascular,Endothelial,1,27,0.037037037037037035,24.0,Female
+donor4,Stromal vascular,Endothelial,39,66,0.5909090909090909,5.0,Female
+donor5,Stromal vascular,Endothelial,8,20,0.4,12.0,Female
+donor6,Stromal vascular,Endothelial,6,101,0.0594059405940594,35.0,Female
+donor7,Stromal vascular,Endothelial,7,351,0.019943019943019943,56.0,Female
+donor8,Stromal vascular,Endothelial,2,141,0.014184397163120567,35.0,Female
+donor9,Stromal vascular,Endothelial,2,107,0.018691588785046728,24.0,Female
+donor10,Stromal vascular,Endothelial,0,4,0.0,35.0,Female
+donor11,Stromal vascular,Endothelial,2,62,0.03225806451612903,9.0,Male
+donor12,Stromal vascular,Endothelial,136,151,0.9006622516556292,22.0,Male
+donor13,Stromal vascular,Endothelial,2,10,0.2,4.0,Female
+donor14,Stromal vascular,Endothelial,103,534,0.19288389513108614,69.0,Male
+donor15,Stromal vascular,Endothelial,6,314,0.01910828025477707,53.0,Male
+donor16,Stromal vascular,Endothelial,41,518,0.07915057915057915,46.0,Female
+donor17,Stromal vascular,Endothelial,0,6,0.0,21.0,Female
+donor18,Stromal vascular,Endothelial,35,853,0.041031652989449004,64.0,Female
+donor1,Myeloid,DC and myeloid,116,116,1.0,56.0,Female
+donor2,Myeloid,DC and myeloid,63,63,1.0,48.0,Female
+donor3,Myeloid,DC and myeloid,48,48,1.0,24.0,Female
+donor4,Myeloid,DC and myeloid,64,64,1.0,5.0,Female
+donor5,Myeloid,DC and myeloid,74,74,1.0,12.0,Female
+donor6,Myeloid,DC and myeloid,21,21,1.0,35.0,Female
+donor7,Myeloid,DC and myeloid,19,19,1.0,56.0,Female
+donor8,Myeloid,DC and myeloid,33,33,1.0,35.0,Female
+donor9,Myeloid,DC and myeloid,25,25,1.0,24.0,Female
+donor10,Myeloid,DC and myeloid,12,12,1.0,35.0,Female
+donor11,Myeloid,DC and myeloid,15,15,1.0,9.0,Male
+donor12,Myeloid,DC and myeloid,17,17,1.0,22.0,Male
+donor13,Myeloid,DC and myeloid,7,7,1.0,4.0,Female
+donor14,Myeloid,DC and myeloid,76,76,1.0,69.0,Male
+donor15,Myeloid,DC and myeloid,11,11,1.0,53.0,Male
+donor16,Myeloid,DC and myeloid,31,31,1.0,46.0,Female
+donor17,Myeloid,DC and myeloid,17,17,1.0,21.0,Female
+donor18,Myeloid,DC and myeloid,71,71,1.0,64.0,Female

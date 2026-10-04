@@ -1,0 +1,72 @@
+atlas_level1,atlas_level2,atlas_level3,n_cells,n_donors,min_age,max_age,analysis_status,status_reason
+Thymocyte/T,Quiescent DP,DP_Q,43873,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Cycling DP,DP_P,13163,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Unresolved,Unresolved,Unknown unresolved,6629,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Alpha-beta entry,αβ_Entry,4885,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+B lineage,B and plasma,MemoryB,4414,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Treg and agonist,Agonist_1,3932,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Quiescent DP,DP unresolved,2856,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,CD4 SP,memory-like CD4 T,2603,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Early DN-like,DN_Q1,2561,16,4.0,64.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,CD8 SP,memory-like CD8 T,2533,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,CD4 SP,CD4 SOX4hi SP,2498,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,CD4 SP,pre-CD4 T,2423,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,CD8 SP,CD8 SOX4hi SP,2017,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Fibroblast,Fibroblast and VSMC,Fb_1,1702,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Cycling DN,DN_P,1503,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,CD4 SP,CD4 SOX4lo SP,1446,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Early DN-like,DN_Q2,1346,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,HSP-associated DP,HSP_DP,1303,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Treg and agonist,pre_Treg1,1240,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,CD8 SP,pre-CD8 T,1202,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Early DN-like,DN unresolved,933,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Fibroblast,Fibroblast and VSMC,Fibroblast unresolved,769,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Treg and agonist,Agonist_2,741,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Treg and agonist,IFN_response,714,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Treg and agonist,Treg,624,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,CD8 SP,CD8 SOX4lo SP,554,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+B lineage,B and plasma,B unresolved,473,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+TEC,cTEC,cTEC_hi,451,14,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+B lineage,B and plasma,NaiveB,387,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Endothelial,Endothelial,Endo,387,15,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Treg and agonist,pre_Treg2,386,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Fibroblast,Fibroblast and VSMC,Fb_2,382,16,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Early DN-like,TP2,345,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Gamma-delta NKT and NK,MatureNK,309,15,9.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Gamma-delta NKT and NK,NKT_like_CD8ααT,293,15,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Endothelial,Endothelial,Endothelial unresolved,228,12,5.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,ISP-like,ISP-like,192,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+B lineage,B and plasma,Plasma,190,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Gamma-delta NKT and NK,γδT_3,175,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Myeloid/DC,DC and myeloid,DC2,164,15,5.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+TEC,Specialized TEC,TEC(neuron),159,15,4.0,64.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Gamma-delta NKT and NK,γδT_1,157,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Gamma-delta NKT and NK,γδT_2,145,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Myeloid/DC,DC and myeloid,pDC,142,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Gamma-delta NKT and NK,GNG4+CD8ααT,128,17,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Gamma-delta NKT and NK,Lti,120,15,5.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Fibroblast,Fibroblast and VSMC,VSMCs,114,12,5.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+TEC,Specialized TEC,TEC unresolved,111,12,4.0,56.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Thymocyte/T,Gamma-delta NKT and NK,MemoryNK,108,16,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+Myeloid/DC,DC and myeloid,DC1,106,18,4.0,69.0,eligible_for_donor_model,at least 100 cells and at least 12 donors
+TEC,cTEC,cTEC_lo,88,14,4.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Myeloid/DC,DC and myeloid,DC1P,82,16,5.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Thymocyte/T,Gamma-delta NKT and NK,ZNF683+CD8ααT,80,16,4.0,64.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Myeloid/DC,DC and myeloid,aDC,78,16,4.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Thymocyte/T,Gamma-delta NKT and NK,ImmatureNK,68,14,5.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Myeloid/DC,DC and myeloid,Monocyte,58,13,5.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Thymocyte/T,Gamma-delta NKT and NK,γδT_P,54,15,4.0,64.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Myeloid/DC,DC and myeloid,Macrophage,49,15,4.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+TEC,Specialized TEC,Ciliated,47,12,4.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+TEC,mTEC,mTEC_hi,45,11,4.0,56.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Thymocyte/T,Gamma-delta NKT and NK,IFN_CD8ααT,32,13,4.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+TEC,mTEC,mTEC_lo,29,10,4.0,64.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Thymocyte/T,Early DN-like,TP1,25,9,5.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+TEC,Specialized TEC,TEC(myo),24,11,4.0,56.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Myeloid/DC,DC and myeloid,Mast,24,10,4.0,69.0,exploratory_only,at least 20 cells and at least 8 donors; not a primary endpoint
+Myeloid/DC,DC and myeloid,Neutrophil,17,7,9.0,56.0,descriptive_only,insufficient cell and/or donor coverage for donor-level modeling
+TEC,mTEC,Immature_TEC,16,9,4.0,69.0,descriptive_only,insufficient cell and/or donor coverage for donor-level modeling
+TEC,Specialized TEC,Ionocyte,11,6,4.0,64.0,descriptive_only,insufficient cell and/or donor coverage for donor-level modeling
+TEC,cTEC,MKI67+cTEC,6,4,4.0,24.0,descriptive_only,insufficient cell and/or donor coverage for donor-level modeling
+TEC,mTEC,post_AIRE_mTEC,5,4,12.0,48.0,descriptive_only,insufficient cell and/or donor coverage for donor-level modeling
+Thymocyte/T,Early DN-like,ETP,3,2,56.0,64.0,descriptive_only,insufficient cell and/or donor coverage for donor-level modeling

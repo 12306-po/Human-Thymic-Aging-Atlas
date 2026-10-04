@@ -1,0 +1,7 @@
+﻿claim_id,claim,evidence,verification_status
+C001,Primary cohort contains 18 donors and 114957 QC-passed cells,release/data/donor_summary.csv; hierarchical_annotation_level2_audit.csv,derived_checked
+C002,Hierarchy contains 19 Level 2 classes and 71 source Level 3 labels,hierarchical_annotation_level2_audit.csv; hierarchical_annotation_level3_audit.csv,derived_checked
+C003,Whole-library donor pseudobulk identified 2851 age-up and 1639 age-down genes at BH q < 0.05,release/data/gene_context_effects.csv.gz,derived_checked
+C004,Internal Elastic Net OOF performance is secondary evidence,release/data/donor_summary.csv,derived_checked
+C005,External four-donor transfer is technical feasibility evidence and not a validated clock,source manuscript; Supplementary Figure S4,author_verification_required
+C006,Level 2 and Level 3 fraction models are exploratory and conditional on recovered lineage pools,build_biology_atlas_v2.py; donor_level2_within_lineage_fractions.csv,derived_checked

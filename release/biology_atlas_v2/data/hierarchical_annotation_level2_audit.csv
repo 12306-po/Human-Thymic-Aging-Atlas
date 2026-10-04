@@ -1,0 +1,20 @@
+atlas_level1,atlas_level2,n_cells,n_donors,min_age,max_age
+B lineage,B and plasma,5464,18,4.0,69.0
+Endothelial,Endothelial,615,16,4.0,69.0
+Fibroblast,Fibroblast and VSMC,2967,18,4.0,69.0
+Myeloid/DC,DC and myeloid,720,18,4.0,69.0
+TEC,cTEC,545,16,4.0,69.0
+TEC,Specialized TEC,352,17,4.0,69.0
+TEC,mTEC,95,16,4.0,69.0
+Thymocyte/T,Quiescent DP,46729,18,4.0,69.0
+Thymocyte/T,Cycling DP,13163,18,4.0,69.0
+Thymocyte/T,CD4 SP,8970,18,4.0,69.0
+Thymocyte/T,Treg and agonist,7637,18,4.0,69.0
+Thymocyte/T,CD8 SP,6306,18,4.0,69.0
+Thymocyte/T,Early DN-like,5213,18,4.0,69.0
+Thymocyte/T,Alpha-beta entry,4885,17,4.0,69.0
+Thymocyte/T,Gamma-delta NKT and NK,1669,18,4.0,69.0
+Thymocyte/T,Cycling DN,1503,17,4.0,69.0
+Thymocyte/T,HSP-associated DP,1303,18,4.0,69.0
+Thymocyte/T,ISP-like,192,17,4.0,69.0
+Unresolved,Unresolved,6629,18,4.0,69.0

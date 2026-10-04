@@ -1,8 +1,8 @@
 # Human Thymic Aging Atlas
 
-An interactive, donor-resolved results atlas for continuous-age analyses of the human thymus. The repository contains the Streamlit application, analysis and figure-generation code, frozen release tables, source workbooks, schemas, provenance manifests and checksums used for the manuscript:
+An interactive, donor-resolved resource for the biology of human thymic aging. The repository now separates a stable broad-cell donor analysis from an audited hierarchy of lineage and source fine states, while retaining the prediction model as a secondary reproducibility diagnostic. It contains the Streamlit application, analysis and figure-generation code, frozen release tables, source workbooks, schemas, provenance manifests and checksums used for the manuscript:
 
-**Human Thymic Aging Atlas: donor-level continuous-age analysis with nested prediction and interpretable ThymusFormer attribution.**
+**A donor-resolved hierarchical atlas of human thymic aging with an interactive biological resource.**
 
 All paths in this README are repository-relative. Server-side runs use the environment variables exported by `analysis/pipeline/00_project_config.sh` (see [Path conventions](#path-conventions)); no hard-coded absolute paths are used.
 
@@ -17,6 +17,9 @@ All paths in this README are repository-relative. Server-side runs use the envir
 
 ## Explore the resource
 
+- **Hierarchical atlas** — Level 1 broad compartments, Level 2 lineage-resolved states and Level 3 source fine labels with donor-coverage gates.
+- **Thymocyte development** — donor-resolved trajectories across early, cycling, double-positive, single-positive and regulatory compartments.
+- **TEC and stroma** — epithelial, fibroblast, endothelial and myeloid niche views with explicit lineage denominators.
 - **Gene explorer** — age effects, q values, pathways, ML selection, Transformer attribution, developmental localization and mouse directional support.
 - **Cell-type explorer** — composition associations, donor coverage, age-up/down genes, pathway overlap and top predictors.
 - **Donor explorer** — age, sex, QC, captured-library composition, out-of-fold prediction and age-adjusted deviation.
@@ -32,10 +35,11 @@ All paths in this README are repository-relative. Server-side runs use the envir
 - GSE195812 provides developmental localization, not independent aging validation.
 - Mouse results provide cross-dataset directional support, not external validation of the human model.
 
-## Three evidence layers
+## Evidence layers
 
-- **Official Atlas:** frozen `v1.0-18donor` manuscript release. Community files cannot modify `release/` or D-010 main results.
-- **External evidence:** separately audited transfer or support. HRA007984 remains supplementary feasibility work, with no external prediction result in this release.
+- **Primary donor inference:** frozen broad-cell and pseudobulk analyses in `release/data/`.
+- **Biological atlas v2:** hierarchical annotation, lineage-focused exploratory models and redrawn figures in `release/biology_atlas_v2/`.
+- **External evidence:** separately audited transfer or support. The HRA007984 four-donor transfer remains a supplementary feasibility result, not a validated external age clock.
 - **Community datasets:** contributor-supplied standardized results. The v1 page only validates and exports a package in the browser session; inclusion requires later human review and a new curated version.
 
 See [Community Submission v1](docs/COMMUNITY_SUBMISSIONS.md) and the [CSV field guide](schemas/README.md). Do not upload controlled-access human data or direct identifiers. There is no server-side submission inbox yet.
@@ -77,6 +81,7 @@ Public GEO metadata for GSE231906 provide only age, sex, tissue, preparation and
 ├── requirements-dl.txt           # deep-learning reproducibility dependencies
 ├── analysis/pipeline/            # numbered analysis pipeline (Steps 00–99)
 │   └── HumanThymusFormer_SPEC.md # fixed model specification
+├── analysis/biology_atlas_v2/    # hierarchical biology rebuild and manuscript generator
 ├── analysis/external_validation/
 ├── analysis/publication_figures_v3/
 ├── docs/
@@ -86,6 +91,7 @@ Public GEO metadata for GSE231906 provide only age, sex, tissue, preparation and
 │   └── donor_metadata_audit.csv
 ├── assets/
 ├── release/data/
+├── release/biology_atlas_v2/     # v2 source tables, vector/raster figures and Word manuscript
 ├── release/source_files/
 ├── release/manifest/
 ├── schemas/
@@ -159,6 +165,20 @@ frozen release tables and figure-specific audit tables by
 PDF and SVG vector figures plus 600-dpi PNG/TIFF derivatives. UMAP and marker
 dot-plot display panels may be rasterized inside the otherwise-vector output;
 quantitative values are never digitized from an image.
+
+The biology-centered v2 hierarchy, all v2 source tables, five main figures and
+four supplementary figures are rebuilt with:
+
+```powershell
+python analysis/biology_atlas_v2/build_biology_atlas_v2.py `
+  --project-root .. `
+  --atlas-root . `
+  --output release/biology_atlas_v2
+```
+
+Level 2 is a conservative consolidation of the source hierarchy. Level 3
+retains source fine labels and is gated by predefined cell and donor coverage;
+it is not presented as a new reference-mapped de novo annotation.
 
 ## Prespecified HRA007984 transfer test
 

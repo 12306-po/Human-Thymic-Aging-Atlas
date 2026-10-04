@@ -1,0 +1,15 @@
+{
+  "document_title": "A donor resolved hierarchical atlas of human thymic aging with an interactive biological resource",
+  "status": "human approval required before submission",
+  "numeric_facts": {
+    "primary_donors": 18,
+    "qc_cells": 114957,
+    "level2_classes": 19,
+    "level3_labels": 71,
+    "whole_library_age_up": 2851,
+    "whole_library_age_down": 1639,
+    "internal_oof_r2": 0.6615889403080109,
+    "internal_oof_mae": 9.394123238624566
+  },
+  "claim_boundary": "Biology-centered donor-resolved reanalysis; fine states exploratory; no clinical age-clock claim"
+}

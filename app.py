@@ -12,6 +12,7 @@ from community_submission import ALLOWED_CELL_TYPES, MAX_FILE_BYTES, EXPECTED_FI
 from submission_store import SessionSubmissionStore
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "release" / "data"
+V2_DATA = ROOT / "release" / "biology_atlas_v2" / "data"
 MANIFEST = ROOT / "release" / "manifest"
 ASSETS = ROOT / "assets"
 st.set_page_config(page_title="Human Thymic Aging Atlas", page_icon="🧬", layout="wide")
@@ -44,6 +45,14 @@ st.markdown(
 @st.cache_data(show_spinner=False)
 def load_csv(name: str) -> pd.DataFrame:
     return pd.read_csv(DATA / name)
+
+
+@st.cache_data(show_spinner=False)
+def load_v2_csv(name: str) -> pd.DataFrame:
+    path = V2_DATA / name
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_csv(path)
 def fmt(value: object, digits: int = 4) -> str:
     if pd.isna(value):
         return "NA"
@@ -65,9 +74,14 @@ cell_pathways = load_csv("cell_type_pathway_overlap.csv.gz")
 donors = load_csv("donor_summary.csv")
 donor_composition = load_csv("donor_composition.csv")
 cohorts = load_csv("cohort_registry.csv")
+hierarchy_level2 = load_v2_csv("hierarchical_annotation_level2_audit.csv")
+hierarchy_level3 = load_v2_csv("hierarchical_annotation_level3_audit.csv")
+hierarchy_umap = load_v2_csv("hierarchical_umap_source.csv.gz")
+level2_fractions = load_v2_csv("donor_level2_within_lineage_fractions.csv")
+level2_models = load_v2_csv("level2_exploratory_age_models.csv")
 hero_left, hero_right = st.columns([1.35, .65], gap="large")
 with hero_left:
-    st.markdown('<div class="hero-panel"><span class="hero-kicker">Open results resource · Release v1</span><div class="hero-title">Human Thymic<br>Aging Atlas</div><div class="hero-copy">Explore continuous-age signals across genes, cell contexts and donors. The atlas connects sex-adjusted pseudobulk effects with machine-learning selection, Transformer attribution, developmental context and cross-dataset directional support.</div><div class="pill-row"><span class="pill">18 independent donors</span><span class="pill">17,181 genes</span><span class="pill">11 cell contexts</span><span class="pill">downloadable source tables</span></div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-panel"><span class="hero-kicker">Biology atlas v2</span><div class="hero-title">Human Thymic<br>Aging Atlas</div><div class="hero-copy">Explore a donor-resolved hierarchy from broad thymic compartments to lineage and source fine states. The resource links thymocyte development, epithelial and stromal remodeling, gene-context age effects, donor coverage and explicit evidence boundaries.</div><div class="pill-row"><span class="pill">18 independent donors</span><span class="pill">114,957 cells</span><span class="pill">3 annotation levels</span><span class="pill">downloadable source tables</span></div></div>', unsafe_allow_html=True)
 with hero_right:
     image = ASSETS / "healthy_human_t_cell.jpg"
     if image.exists():
@@ -76,7 +90,10 @@ with hero_right:
 st.write("")
 scope_note()
 st.write("")
-overview_tab, gene_tab, cell_tab, donor_tab, download_tab, contribute_tab = st.tabs(["Overview", "Gene explorer", "Cell-type explorer", "Donor explorer", "Downloads & provenance", "Contribute data"])
+overview_tab, hierarchy_tab, thymocyte_tab, niche_tab, gene_tab, cell_tab, donor_tab, download_tab, contribute_tab = st.tabs([
+    "Biological story", "Hierarchical atlas", "Thymocyte development", "TEC & stroma",
+    "Gene explorer", "Broad-cell evidence", "Donor evidence", "Methods & downloads", "Contribute data",
+])
 with overview_tab:
     st.markdown('<div class="section-label">Resource architecture</div>', unsafe_allow_html=True)
     st.subheader("From organ context to donor-resolved evidence")
@@ -106,6 +123,71 @@ with overview_tab:
     fig = px.bar(counts, x="Genes", y="Layer", orientation="h", color="Layer", color_discrete_sequence=["#0b756d","#3c8b81","#5e9ca0","#315f91","#c95858"])
     fig.update_layout(showlegend=False, height=360, margin=dict(l=10,r=15,t=10,b=10))
     st.plotly_chart(fig, use_container_width=True)
+
+with hierarchy_tab:
+    st.markdown('<div class="section-label">Three-level annotation</div>', unsafe_allow_html=True)
+    st.subheader("Move from robust donor inference to fine atlas states")
+    st.caption("Level 1 remains the primary donor-level label. Levels 2 and 3 are an audited atlas layer; coverage status does not establish biological validity by itself.")
+    if hierarchy_umap.empty:
+        st.warning("Biology atlas v2 tables are not available. Run analysis/biology_atlas_v2/build_biology_atlas_v2.py.")
+    else:
+        color_level = st.radio("Color UMAP by", ["atlas_level1", "atlas_level2", "atlas_level3"], horizontal=True)
+        max_points = min(40000, len(hierarchy_umap))
+        sampled = hierarchy_umap.sample(max_points, random_state=371) if len(hierarchy_umap) > max_points else hierarchy_umap
+        fig = px.scatter(sampled, x="umap_1", y="umap_2", color=color_level,
+                         render_mode="webgl", opacity=.65,
+                         labels={"umap_1": "UMAP 1", "umap_2": "UMAP 2", color_level: color_level.replace("atlas_", "").replace("_", " ").title()})
+        fig.update_traces(marker={"size": 2.4})
+        fig.update_layout(height=620, margin=dict(l=10, r=10, t=20, b=10))
+        st.plotly_chart(fig, use_container_width=True)
+        left, right = st.columns(2)
+        with left:
+            st.markdown("#### Level 2 donor coverage")
+            st.dataframe(hierarchy_level2, use_container_width=True, hide_index=True, height=410)
+        with right:
+            st.markdown("#### Level 3 analysis gate")
+            status = st.multiselect("Status", sorted(hierarchy_level3["analysis_status"].dropna().unique()),
+                                    default=sorted(hierarchy_level3["analysis_status"].dropna().unique()))
+            st.dataframe(hierarchy_level3.loc[hierarchy_level3["analysis_status"].isin(status)],
+                         use_container_width=True, hide_index=True, height=410)
+
+with thymocyte_tab:
+    st.markdown('<div class="section-label">Developmental atlas</div>', unsafe_allow_html=True)
+    st.subheader("Thymocyte states across donor age")
+    st.caption("Fractions use the recovered T-lineage pool as the denominator and are exploratory; they are not native whole-thymus abundances.")
+    t_fraction = level2_fractions.loc[level2_fractions["family"].eq("T lineage")].copy()
+    if t_fraction.empty:
+        st.warning("Thymocyte v2 tables are not available.")
+    else:
+        default_states = [x for x in ["Early DN-like", "Cycling DN", "Cycling DP", "Quiescent DP", "CD4 SP", "CD8 SP"] if x in t_fraction["atlas_level2"].unique()]
+        states = st.multiselect("States", sorted(t_fraction["atlas_level2"].unique()), default=default_states)
+        shown = t_fraction.loc[t_fraction["atlas_level2"].isin(states)]
+        fig = px.scatter(shown, x="age_years", y="within_lineage_fraction", color="atlas_level2",
+                         trendline="ols", hover_data=["donor_id", "sex", "n_cells", "lineage_denominator"],
+                         labels={"age_years": "Age years", "within_lineage_fraction": "Fraction within recovered T lineage", "atlas_level2": "State"})
+        fig.update_layout(height=520, legend_title_text="")
+        st.plotly_chart(fig, use_container_width=True)
+        st.markdown("#### Exploratory sex-adjusted models")
+        st.dataframe(level2_models.loc[level2_models["family"].eq("T lineage")], use_container_width=True, hide_index=True)
+
+with niche_tab:
+    st.markdown('<div class="section-label">Epithelial and stromal niche</div>', unsafe_allow_html=True)
+    st.subheader("TEC stromal vascular and myeloid compartments")
+    st.caption("TEC fractions are calculated within recovered TEC; stromal fractions are calculated within the recovered fibroblast/endothelial pool.")
+    niche_fraction = level2_fractions.loc[level2_fractions["family"].isin(["TEC", "Stromal vascular", "Myeloid"])].copy()
+    if niche_fraction.empty:
+        st.warning("Niche v2 tables are not available.")
+    else:
+        families = st.multiselect("Compartment", ["TEC", "Stromal vascular", "Myeloid"], default=["TEC", "Stromal vascular"])
+        shown = niche_fraction.loc[niche_fraction["family"].isin(families)]
+        fig = px.scatter(shown, x="age_years", y="within_lineage_fraction", color="atlas_level2",
+                         facet_col="family", trendline="ols",
+                         hover_data=["donor_id", "sex", "n_cells", "lineage_denominator"],
+                         labels={"age_years": "Age years", "within_lineage_fraction": "Fraction within recovered compartment", "atlas_level2": "State"})
+        fig.update_layout(height=520, legend_title_text="")
+        st.plotly_chart(fig, use_container_width=True)
+        st.markdown("#### Exploratory sex-adjusted models")
+        st.dataframe(level2_models.loc[level2_models["family"].isin(families)], use_container_width=True, hide_index=True)
 with gene_tab:
     st.markdown('<div class="section-label">Gene-level lookup</div>', unsafe_allow_html=True)
     st.subheader("Follow one gene across evidence layers")

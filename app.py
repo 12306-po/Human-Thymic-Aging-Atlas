@@ -10,7 +10,7 @@ from uuid import uuid4
 
 from community_submission import ALLOWED_CELL_TYPES, MAX_FILE_BYTES, EXPECTED_FILES, make_download_package, validate_submission
 from submission_store import SessionSubmissionStore
-from research_extension import render_age_research
+from research_extension import render_age_research, render_new_sample_predictor
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "release" / "data"
 V2_DATA = ROOT / "release" / "biology_atlas_v2" / "data"
@@ -89,9 +89,9 @@ with hero_right:
 st.write("")
 scope_note()
 st.write("")
-overview_tab, hierarchy_tab, thymocyte_tab, niche_tab, gene_tab, cell_tab, donor_tab, age_tab, download_tab, contribute_tab = st.tabs([
+overview_tab, hierarchy_tab, thymocyte_tab, niche_tab, gene_tab, cell_tab, donor_tab, age_tab, predict_tab, download_tab, contribute_tab = st.tabs([
     "Biological story", "Hierarchical atlas", "Thymocyte development", "TEC & stroma",
-    "Gene explorer", "Broad-cell evidence", "Donor evidence", "Age prediction research",
+    "Gene explorer", "Broad-cell evidence", "Donor evidence", "Age prediction research", "Predict new sample",
     "Methods & downloads", "Contribute data",
 ])
 with overview_tab:
@@ -245,6 +245,8 @@ with donor_tab:
         else: st.plotly_chart(px.bar(comp.sort_values("captured_fraction",ascending=False),x="cell_type",y="captured_fraction",labels={"captured_fraction":"Fraction of captured QC-passed cells","cell_type":""},color_discrete_sequence=["#0b756d"]),use_container_width=True)
 with age_tab:
     render_age_research(ROOT)
+with predict_tab:
+    render_new_sample_predictor(ROOT)
 with download_tab:
     st.markdown('<div class="section-label">Open-science release</div>',unsafe_allow_html=True); st.subheader("Files, cohorts and provenance")
     st.dataframe(cohorts,use_container_width=True,hide_index=True); st.caption("Only GSE231906 is included in release v1. Candidate external cohorts remain excluded until unique-donor, age, health, preparation and overlap audits are complete.")
@@ -255,7 +257,7 @@ with download_tab:
 with contribute_tab:
     st.markdown('<div class="section-label">Community datasets · session-only preview</div>', unsafe_allow_html=True)
     st.subheader("Contribute standardized results")
-    st.info("This page validates and packages a dataset in your current browser session. It does not send data to the maintainers, save a server copy, or change the official v1.0-18donor Atlas.")
+    st.info("This page validates and packages a dataset during your web session. Uploads are transferred to the website server's memory; this app does not save a persistent server copy, forward files to the maintainers, or change the official v1.0-18donor Atlas.")
     st.warning("Upload only de-identified, shareable summary data. Do not upload controlled-access human data, names, dates of birth, contact details, clinical records, FASTQ, H5AD, or raw sequencing files. A checkbox cannot verify de-identification.")
     st.markdown("Use the three templates below; field definitions are in `schemas/README.md`. Each file is limited to 10 MiB and 200,000 rows.")
     template_columns = st.columns(3)

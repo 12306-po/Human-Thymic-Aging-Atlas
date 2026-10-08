@@ -9,6 +9,11 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from age_prediction_inference import (
+    MAX_UPLOAD_BYTES, feature_template, load_frozen_model,
+    parse_feature_upload, predict_age,
+)
+
 
 def render_age_research(root: Path) -> None:
     st.subheader("Donor-level age prediction · research evidence")
@@ -106,5 +111,83 @@ def render_age_research(root: Path) -> None:
         file_name="t05_donor_age_predictions.tsv",
         mime="text/tab-separated-values",
     )
+
+
+def render_new_sample_predictor(root: Path) -> None:
+    st.subheader("Predict a new donor sample · research prototype")
+    st.caption(
+        "This page uses a separately frozen model fitted on all 18 discovery donors. "
+        "It does not refit the model using uploaded samples or reuse a held-out "
+        "prediction from the validation table."
+    )
+    st.warning(
+        "No independent multi-donor external age validation is available for this "
+        "T05 model. The output is not a diagnosis, health score, or clinically "
+        "validated immune age."
+    )
+    model_path = root / "release" / "age_prediction_model_v1" / "frozen_t05_model.json"
+    if not model_path.is_file():
+        st.info(
+            "Prediction is not enabled yet. The final model must first be frozen on "
+            "the analysis server and verified against all 18 T05C held-out predictions. "
+            "The existing age-result tables alone cannot predict a new sample."
+        )
+        return
+    try:
+        model = load_frozen_model(model_path)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        st.error(f"Prediction is disabled because the frozen model failed validation: {exc}")
+        return
+
+    st.markdown("#### 1 · Prepare one donor's features")
+    st.write(
+        "Use the same frozen scGPT encoder, label crosswalk, and donor-level feature "
+        "processing as T05B. Upload exactly one de-identified donor row containing "
+        "the model's 542 numeric features. The three *Contribute data* CSV files "
+        "are not model input and must not be uploaded here."
+    )
+    st.download_button(
+        "Download exact 542-feature TSV template", feature_template(model),
+        file_name="donor_features.tsv", mime="text/tab-separated-values",
+    )
+    st.markdown("#### 2 · Upload and predict")
+    st.caption(
+        "Uploads travel to the website server's memory for this session. This app "
+        "does not write them to disk or add them to the atlas. Do not upload raw "
+        "H5AD/FASTQ, controlled-access data, names, or clinical records."
+    )
+    uploaded = st.file_uploader(
+        "donor_features.tsv · one donor · maximum 256 KiB", type=["tsv"],
+        key="new_donor_age_features",
+    )
+    if uploaded is not None and uploaded.size > MAX_UPLOAD_BYTES:
+        st.error("Feature table exceeds 256 KiB; prediction is disabled.")
+    consent = st.checkbox(
+        "I am authorized to upload this de-identified feature table to a public "
+        "research website.", key="new_donor_age_consent",
+    )
+    if not st.button("Predict research age", disabled=(uploaded is None or not consent
+                     or uploaded.size > MAX_UPLOAD_BYTES),
+                     type="primary", key="predict_new_donor_age"):
+        return
+    try:
+        donor_id, values = parse_feature_upload(uploaded.getvalue(), uploaded.name, model)
+        predicted, outside_range = predict_age(model, values)
+    except ValueError as exc:
+        st.error(f"Prediction not produced: {exc}")
+        return
+    st.metric("Predicted age", f"{predicted:.1f} years")
+    st.caption(f"Sample ID: {donor_id} · {outside_range}/542 input features outside "
+               "the minimum–maximum values seen across the 18 training donors.")
+    if predicted < model.training_age_min or predicted > model.training_age_max:
+        st.warning(
+            f"Prediction lies outside the model's training-age range "
+            f"({model.training_age_min:.0f}–{model.training_age_max:.0f} years)."
+        )
+    if outside_range:
+        st.warning(
+            "At least one feature falls outside the training range. Confirm that "
+            "the same encoder, cell labels, normalization and feature order were used."
+        )
 
 

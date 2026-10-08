@@ -1,0 +1,13 @@
+{
+  "status": "research_only",
+  "source": "T05C/T05D/T05F frozen scGPT donor-level analyses",
+  "primary_model": {
+    "name": "scgpt_global_plus_composition__ridge",
+    "mae_years": 13.65598127353677,
+    "cv_r2": 0.3132198929225139,
+    "baseline_mae_years": 18.07843137254902
+  },
+  "n_donors": 18,
+  "external_multi_donor_age_validation": false,
+  "gap_scope": "Exploratory, age-bias-corrected donor residual; not a clinical immune age"
+}

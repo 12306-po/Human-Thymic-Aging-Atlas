@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from community_submission import ALLOWED_CELL_TYPES, MAX_FILE_BYTES, EXPECTED_FILES, make_download_package, validate_submission
 from submission_store import SessionSubmissionStore
+from research_extension import render_age_research
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "release" / "data"
 V2_DATA = ROOT / "release" / "biology_atlas_v2" / "data"
@@ -66,11 +67,9 @@ def scope_note() -> None:
     )
 gene_summary = load_csv("gene_summary.csv.gz")
 effects = load_csv("gene_context_effects.csv.gz")
-gene_pathways = load_csv("gene_pathway_links.csv.gz")
 developmental = load_csv("developmental_context.csv.gz")
 cell_summary = load_csv("cell_type_summary.csv")
 cell_genes = load_csv("cell_type_genes.csv.gz")
-cell_pathways = load_csv("cell_type_pathway_overlap.csv.gz")
 donors = load_csv("donor_summary.csv")
 donor_composition = load_csv("donor_composition.csv")
 cohorts = load_csv("cohort_registry.csv")
@@ -85,14 +84,15 @@ with hero_left:
 with hero_right:
     image = ASSETS / "healthy_human_t_cell.jpg"
     if image.exists():
-        st.image(str(image), use_container_width=True)
+        st.image(str(image), use_column_width=True)
         st.markdown('<div class="image-credit">Healthy human T lymphocyte, scanning electron micrograph. NIAID/NIH, public domain. Decorative context; not study data.</div>', unsafe_allow_html=True)
 st.write("")
 scope_note()
 st.write("")
-overview_tab, hierarchy_tab, thymocyte_tab, niche_tab, gene_tab, cell_tab, donor_tab, download_tab, contribute_tab = st.tabs([
+overview_tab, hierarchy_tab, thymocyte_tab, niche_tab, gene_tab, cell_tab, donor_tab, age_tab, download_tab, contribute_tab = st.tabs([
     "Biological story", "Hierarchical atlas", "Thymocyte development", "TEC & stroma",
-    "Gene explorer", "Broad-cell evidence", "Donor evidence", "Methods & downloads", "Contribute data",
+    "Gene explorer", "Broad-cell evidence", "Donor evidence", "Age prediction research",
+    "Methods & downloads", "Contribute data",
 ])
 with overview_tab:
     st.markdown('<div class="section-label">Resource architecture</div>', unsafe_allow_html=True)
@@ -101,16 +101,16 @@ with overview_tab:
     with left:
         lobule = ASSETS / "thymus_lobule_nih_bioart.svg"
         if lobule.exists():
-            st.image(str(lobule), use_container_width=True)
+            st.image(str(lobule), use_column_width=True)
             st.markdown('<div class="image-credit">Thymus lobule © Human Reference Atlas / NIAID NIH BioArt, CC BY 4.0. Decorative anatomical context; not study data.</div>', unsafe_allow_html=True)
     with right:
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown('<div class="atlas-card"><h4>Gene evidence</h4><p>Age effects by context, q values, pathways, ML selection, Transformer attribution and mouse directional support.</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="atlas-card"><h4>Gene evidence</h4><p>Age effects by context, q values, ML selection, Transformer attribution and mouse directional support.</p></div>', unsafe_allow_html=True)
             st.write("")
             st.markdown('<div class="atlas-card"><h4>Donor evidence</h4><p>Age, sex, QC, captured-library composition, out-of-fold prediction and age-adjusted deviation.</p></div>', unsafe_allow_html=True)
         with c2:
-            st.markdown('<div class="atlas-card"><h4>Cell-type evidence</h4><p>Composition associations, donor coverage, age-up and age-down genes, pathways and top predictors.</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="atlas-card"><h4>Cell-type evidence</h4><p>Composition associations, donor coverage, age-up and age-down genes, and top predictors.</p></div>', unsafe_allow_html=True)
             st.write("")
             st.markdown('<div class="atlas-card"><h4>Reproducibility</h4><p>CSV, H5AD, source workbooks, code, schemas, provenance manifests and SHA-256 checksums.</p></div>', unsafe_allow_html=True)
     st.write("")
@@ -214,17 +214,9 @@ with gene_tab:
         labels = ["ML consensus selection","ML feature count","Transformer top-100","Best IG cell type","Best IG rank","Mouse RNA direction","Mouse RNA concordant","Mouse ATAC concordant","Developmental top state"]
         keys = ["in_ML_consensus","ml_n_features","in_DL_top100","transformer_best_ig_celltype","transformer_best_ig_rank","mouse_RNA_direction","mouse_RNA_concordant","mouse_ATAC_concordant","developmental_top_stage"]
         st.dataframe(pd.DataFrame({"Evidence":labels,"Value":[fmt(record.get(k)) for k in keys]}),use_container_width=True,hide_index=True)
-    p1,p2=st.columns(2)
-    with p1:
-        st.markdown("#### Pathway evidence"); path_rows=gene_pathways.loc[gene_pathways["gene"].eq(selected_gene)]
-        if path_rows.empty:
-            st.caption("No pathway membership in current outputs.")
-        else:
-            st.dataframe(path_rows[["evidence_layer","gene_set_library","pathway","pathway_q_value","odds_ratio"]].head(100),use_container_width=True,hide_index=True)
-    with p2:
-        st.markdown("#### Developmental localization"); dev=developmental.loc[developmental["gene"].astype(str).str.upper().eq(selected_gene)]
-        if dev.empty: st.caption("Not available in the current GSE195812 localization table.")
-        else: st.plotly_chart(px.bar(dev.sort_values("developmental_stage"),x="developmental_stage",y="mean_zscore",color="source_object",hover_data={"pct_expr":":.2f","n_cells":True},labels={"mean_zscore":"Mean within-object z-score","developmental_stage":"Stage"}),use_container_width=True)
+    st.markdown("#### Developmental localization"); dev=developmental.loc[developmental["gene"].astype(str).str.upper().eq(selected_gene)]
+    if dev.empty: st.caption("Not available in the current GSE195812 localization table.")
+    else: st.plotly_chart(px.bar(dev.sort_values("developmental_stage"),x="developmental_stage",y="mean_zscore",color="source_object",hover_data={"pct_expr":":.2f","n_cells":True},labels={"mean_zscore":"Mean within-object z-score","developmental_stage":"Stage"}),use_container_width=True)
 with cell_tab:
     st.markdown('<div class="section-label">Cell-context view</div>',unsafe_allow_html=True); st.subheader("Composition and transcriptional evidence")
     selected_cell=st.selectbox("Cell type",cell_summary["cell_type"].sort_values().tolist()); rec=cell_summary.loc[cell_summary["cell_type"].eq(selected_cell)].iloc[0]
@@ -239,11 +231,6 @@ with cell_tab:
             st.caption("No Transformer token was available for this cell type.")
         else:
             st.dataframe(pred[["gene","transformer_best_ig_rank","transformer_best_ig_importance","in_ML_consensus"]].sort_values("transformer_best_ig_rank"),use_container_width=True,hide_index=True)
-        st.markdown("#### Pathway evidence overlap"); cp=cell_pathways.loc[cell_pathways["cell_type"].eq(selected_cell)]
-        if cp.empty:
-            st.caption("No overlap with the current pathway evidence table.")
-        else:
-            st.dataframe(cp[["direction","pathway","n_overlap_genes","overlap_genes","source_pathway_q_value"]].head(50),use_container_width=True,hide_index=True,height=350)
 with donor_tab:
     st.markdown('<div class="section-label">Donor-resolved view</div>',unsafe_allow_html=True); st.subheader("Metadata, QC and out-of-fold prediction")
     selected=st.selectbox("Donor",donors["donor_id"].astype(str).sort_values().tolist()); donor=donors.loc[donors["donor_id"].astype(str).eq(selected)].iloc[0]
@@ -256,10 +243,13 @@ with donor_tab:
         st.markdown("#### Captured-library cell composition"); comp=donor_composition.loc[donor_composition["donor_id"].astype(str).eq(selected)].copy(); comp["captured_fraction"]=pd.to_numeric(comp.get("captured_fraction"),errors="coerce"); comp=comp.dropna(subset=["captured_fraction"])
         if comp.empty: st.warning("The donor-level composition source table is not present in the local bundle. Run export_server_inputs.py on the analysis server, then rebuild the release.")
         else: st.plotly_chart(px.bar(comp.sort_values("captured_fraction",ascending=False),x="cell_type",y="captured_fraction",labels={"captured_fraction":"Fraction of captured QC-passed cells","cell_type":""},color_discrete_sequence=["#0b756d"]),use_container_width=True)
+with age_tab:
+    render_age_research(ROOT)
 with download_tab:
     st.markdown('<div class="section-label">Open-science release</div>',unsafe_allow_html=True); st.subheader("Files, cohorts and provenance")
     st.dataframe(cohorts,use_container_width=True,hide_index=True); st.caption("Only GSE231906 is included in release v1. Candidate external cohorts remain excluded until unique-donor, age, health, preparation and overlap audits are complete.")
-    downloadable=sorted(DATA.glob("*"))+sorted(MANIFEST.glob("*"))+sorted((ROOT/"release"/"source_files").glob("*"))+sorted((ROOT/"release"/"figures").glob("*")); columns=st.columns(3)
+    downloadable=sorted(DATA.glob("*"))+sorted(MANIFEST.glob("*"))+sorted((ROOT/"release"/"source_files").glob("*"))+sorted((ROOT/"release"/"figures").glob("*"))
+    downloadable=[p for p in downloadable if not any(term in p.name.lower() for term in ("pathway", "enrich", "hallmark", "cellchat", "communication"))]; columns=st.columns(3)
     for i,path in enumerate(downloadable): columns[i%3].download_button(label=f"Download {path.name}",data=path.read_bytes(),file_name=path.name,mime="application/octet-stream",key=f"download_{path.name}")
     st.markdown("#### Image credits"); st.markdown("- **Healthy Human T Cell** — NIAID/NIH, public domain, via Wikimedia Commons.\n- **Thymus Lobule** — Human Reference Atlas / NIAID NIH BioArt, CC BY 4.0, via Wikimedia Commons.\n\nBoth images are visual context only; neither is a result from this study.")
 with contribute_tab:

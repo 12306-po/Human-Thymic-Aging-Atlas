@@ -1,0 +1,13 @@
+{
+  "version": "core_v1",
+  "site_functions": ["atlas_browsing", "donor_evidence", "results_and_code_downloads"],
+  "donor17": {
+    "gsm_id": "GSM8945775",
+    "source_age": "21 months",
+    "age_years": 1.75,
+    "source_url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM8945775"
+  },
+  "scope": "Corrected metadata and descriptive atlas coverage/composition",
+  "age_association_results": "Archived results not served by the current app",
+  "prediction_results": "Removed from the current app and its downloadable bundles"
+}

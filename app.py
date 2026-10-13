@@ -1,322 +1,195 @@
 from __future__ import annotations
+
 from pathlib import Path
-import numpy as np
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from datetime import datetime, timezone
-from hashlib import sha256
-from uuid import uuid4
 
-from community_submission import ALLOWED_CELL_TYPES, MAX_FILE_BYTES, EXPECTED_FILES, make_download_package, validate_submission
-from submission_store import SessionSubmissionStore
-from research_extension import render_age_research, render_new_sample_predictor
-ROOT = Path(__file__).resolve().parent
-DATA = ROOT / "release" / "data"
-V2_DATA = ROOT / "release" / "biology_atlas_v2" / "data"
-MANIFEST = ROOT / "release" / "manifest"
-ASSETS = ROOT / "assets"
-st.set_page_config(page_title="Human Thymic Aging Atlas", page_icon="🧬", layout="wide")
-st.markdown(
-    """
-    <style>
-    :root {--ink:#102a2d;--muted:#5d7072;--teal:#0b756d;--paper:#fbfdfc;}
-    .stApp {background:radial-gradient(circle at 8% 0%,rgba(93,189,169,.16),transparent 28rem),radial-gradient(circle at 98% 8%,rgba(88,129,180,.12),transparent 32rem),var(--paper);}
-    .block-container {max-width:1280px;padding-top:1.4rem;padding-bottom:4rem;}
-    h1,h2,h3,h4 {color:var(--ink);letter-spacing:-.02em;}
-    .hero-kicker {display:inline-flex;padding:.38rem .72rem;border-radius:999px;color:#08665f;background:#dff3ec;border:1px solid #b9ded2;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
-    .hero-title {font-size:clamp(2.55rem,5vw,4.8rem);line-height:.98;margin:1rem 0 .9rem;font-weight:760;}
-    .hero-copy {font-size:1.12rem;line-height:1.7;color:var(--muted);max-width:46rem;}
-    .hero-panel {padding:2.4rem 2.5rem;border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(238,248,245,.9));border:1px solid rgba(21,96,89,.14);box-shadow:0 24px 65px rgba(35,80,76,.10);}
-    .pill-row {display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.35rem;}.pill {padding:.42rem .72rem;border-radius:999px;background:#fff;border:1px solid #d7e5e1;color:#38585a;font-size:.82rem;}
-    .section-label {color:#0b756d;text-transform:uppercase;letter-spacing:.12em;font-size:.76rem;font-weight:800;margin-bottom:.25rem;}
-    .atlas-card {height:100%;padding:1.15rem 1.2rem;border-radius:18px;background:rgba(255,255,255,.84);border:1px solid #dfe9e6;box-shadow:0 10px 28px rgba(35,73,70,.055);}
-    .atlas-card h4 {margin:.15rem 0 .4rem;font-size:1.05rem;}.atlas-card p {margin:0;color:#667779;line-height:1.55;font-size:.9rem;}
-    .scope-note {padding:1rem 1.15rem;border-left:4px solid #0b756d;border-radius:10px;background:#edf7f4;color:#365759;line-height:1.55;}
-    div[data-testid="stMetric"] {background:rgba(255,255,255,.86);border:1px solid #dde8e5;padding:.9rem 1rem;border-radius:16px;box-shadow:0 8px 22px rgba(34,70,67,.05);}
-    div[data-testid="stDataFrame"] {border:1px solid #e0e8e6;border-radius:14px;overflow:hidden;}
-    .stTabs [data-baseweb="tab-list"] {gap:.35rem;background:#edf4f2;padding:.38rem;border-radius:14px;}
-    .stTabs [data-baseweb="tab"] {height:2.75rem;border-radius:10px;padding:0 1rem;color:#486163;}
-    .stTabs [aria-selected="true"] {background:white;color:#075f59;box-shadow:0 4px 14px rgba(30,80,74,.08);}
-    .image-credit {font-size:.74rem;color:#78888a;line-height:1.45;}.footer {margin-top:2rem;padding-top:1.2rem;border-top:1px solid #dce7e4;color:#718183;font-size:.82rem;}
-    </style>
-    """,
-    unsafe_allow_html=True,
+from atlas_core_data import (
+    GEO_DONOR17, LEVELS, coverage, csv_bytes, donor_counts,
+    load_core, result_files, source_files, zip_bytes,
 )
-@st.cache_data(show_spinner=False)
-def load_csv(name: str) -> pd.DataFrame:
-    return pd.read_csv(DATA / name)
+
+ROOT = Path(__file__).resolve().parent
+TABS = ["图谱浏览 · Atlas", "供者级证据查询 · Donors", "结果与代码下载 · Downloads"]
 
 
 @st.cache_data(show_spinner=False)
-def load_v2_csv(name: str) -> pd.DataFrame:
-    path = V2_DATA / name
-    if not path.exists():
-        return pd.DataFrame()
-    return pd.read_csv(path)
-def fmt(value: object, digits: int = 4) -> str:
-    if pd.isna(value):
-        return "NA"
-    if isinstance(value, (float, np.floating)):
-        return f"{value:.{digits}g}"
-    return str(value)
-def scope_note() -> None:
-    st.markdown(
-        '<div class="scope-note"><strong>Interpretation boundary.</strong> Release v1 summarizes donor-resolved analyses of GSE231906 (18 donors). Captured-library fractions follow nominal 6:4 CD45-positive/CD45-negative recombination and are not native-tissue composition. Donor deviation is descriptive and is not a validated clinical biological-age score.</div>',
-        unsafe_allow_html=True,
-    )
-gene_summary = load_csv("gene_summary.csv.gz")
-effects = load_csv("gene_context_effects.csv.gz")
-developmental = load_csv("developmental_context.csv.gz")
-cell_summary = load_csv("cell_type_summary.csv")
-cell_genes = load_csv("cell_type_genes.csv.gz")
-donors = load_csv("donor_summary.csv")
-donor_composition = load_csv("donor_composition.csv")
-cohorts = load_csv("cohort_registry.csv")
-hierarchy_level2 = load_v2_csv("hierarchical_annotation_level2_audit.csv")
-hierarchy_level3 = load_v2_csv("hierarchical_annotation_level3_audit.csv")
-hierarchy_umap = load_v2_csv("hierarchical_umap_source.csv.gz")
-level2_fractions = load_v2_csv("donor_level2_within_lineage_fractions.csv")
-level2_models = load_v2_csv("level2_exploratory_age_models.csv")
-hero_left, hero_right = st.columns([1.35, .65], gap="large")
-with hero_left:
-    st.markdown('<div class="hero-panel"><span class="hero-kicker">Biology atlas v2</span><div class="hero-title">Human Thymic<br>Aging Atlas</div><div class="hero-copy">Explore a donor-resolved hierarchy from broad thymic compartments to lineage and source fine states. The resource links thymocyte development, epithelial and stromal remodeling, gene-context age effects, donor coverage and explicit evidence boundaries.</div><div class="pill-row"><span class="pill">18 independent donors</span><span class="pill">114,957 cells</span><span class="pill">3 annotation levels</span><span class="pill">downloadable source tables</span></div></div>', unsafe_allow_html=True)
-with hero_right:
-    image = ASSETS / "healthy_human_t_cell.jpg"
-    if image.exists():
-        st.image(str(image), use_column_width=True)
-        st.markdown('<div class="image-credit">Healthy human T lymphocyte, scanning electron micrograph. NIAID/NIH, public domain. Decorative context; not study data.</div>', unsafe_allow_html=True)
-st.write("")
-scope_note()
-st.write("")
-overview_tab, hierarchy_tab, thymocyte_tab, niche_tab, gene_tab, cell_tab, donor_tab, age_tab, predict_tab, download_tab, contribute_tab = st.tabs([
-    "Biological story", "Hierarchical atlas", "Thymocyte development", "TEC & stroma",
-    "Gene explorer", "Broad-cell evidence", "Donor evidence", "Age prediction research", "Predict new sample",
-    "Methods & downloads", "Contribute data",
-])
-with overview_tab:
-    st.markdown('<div class="section-label">Resource architecture</div>', unsafe_allow_html=True)
-    st.subheader("From organ context to donor-resolved evidence")
-    left, right = st.columns([.9, 1.1], gap="large")
-    with left:
-        lobule = ASSETS / "thymus_lobule_nih_bioart.svg"
-        if lobule.exists():
-            st.image(str(lobule), use_column_width=True)
-            st.markdown('<div class="image-credit">Thymus lobule © Human Reference Atlas / NIAID NIH BioArt, CC BY 4.0. Decorative anatomical context; not study data.</div>', unsafe_allow_html=True)
-    with right:
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown('<div class="atlas-card"><h4>Gene evidence</h4><p>Age effects by context, q values, ML selection, Transformer attribution and mouse directional support.</p></div>', unsafe_allow_html=True)
-            st.write("")
-            st.markdown('<div class="atlas-card"><h4>Donor evidence</h4><p>Age, sex, QC, captured-library composition, out-of-fold prediction and age-adjusted deviation.</p></div>', unsafe_allow_html=True)
-        with c2:
-            st.markdown('<div class="atlas-card"><h4>Cell-type evidence</h4><p>Composition associations, donor coverage, age-up and age-down genes, and top predictors.</p></div>', unsafe_allow_html=True)
-            st.write("")
-            st.markdown('<div class="atlas-card"><h4>Reproducibility</h4><p>CSV, H5AD, source workbooks, code, schemas, provenance manifests and SHA-256 checksums.</p></div>', unsafe_allow_html=True)
-    st.write("")
+def core_data():
+    return load_core(ROOT)
+
+
+@st.cache_data(show_spinner=False)
+def download_data(donors, cells):
+    return result_files(donors, cells)
+
+
+def main():
+    st.set_page_config(page_title="Human Thymic Aging Atlas", page_icon="🧬", layout="wide")
+    st.markdown("""
+    <style>
+    .stApp {background:#f7faf9;}
+    .block-container {max-width:1280px;padding-top:1.6rem;}
+    h1,h2,h3 {color:#163d3b;}
+    div[data-testid="stMetric"] {background:#fff;border:1px solid #dce8e4;border-radius:12px;padding:12px;}
+    .stTabs [data-baseweb="tab-list"] {gap:14px;}
+    .stTabs [data-baseweb="tab"] {height:50px;}
+    </style>
+    """, unsafe_allow_html=True)
+    st.title("人胸腺单细胞图谱与供者证据查询")
+    st.caption("Human Thymic Aging Atlas · GSE231906 · 分层标签、供者覆盖与可复现的数据")
+
+    try:
+        donors, cells = core_data()
+    except (OSError, ValueError, KeyError) as exc:
+        st.error(f"图谱数据未通过校验：{exc}")
+        st.stop()
+
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Genes indexed", f"{gene_summary['gene'].nunique():,}")
-    m2.metric("Gene × context rows", f"{len(effects):,}")
-    m3.metric("Cell contexts", f"{cell_summary['cell_type'].nunique():,}")
-    m4.metric("Primary donors", f"{donors['donor_id'].nunique():,}")
-    counts = pd.DataFrame({"Layer":["Human age association","ML consensus","Transformer top-100","Mouse RNA concordance","Mouse ATAC concordance"],"Genes":[int(gene_summary["whole_thymus_q_value"].lt(.05).sum()),int(gene_summary["in_ML_consensus"].fillna(False).astype(bool).sum()),int(gene_summary["in_DL_top100"].fillna(False).astype(bool).sum()),int(gene_summary["mouse_RNA_concordant"].fillna(False).astype(bool).sum()),int(gene_summary["mouse_ATAC_concordant"].fillna(False).astype(bool).sum())]})
-    fig = px.bar(counts, x="Genes", y="Layer", orientation="h", color="Layer", color_discrete_sequence=["#0b756d","#3c8b81","#5e9ca0","#315f91","#c95858"])
-    fig.update_layout(showlegend=False, height=360, margin=dict(l=10,r=15,t=10,b=10))
-    st.plotly_chart(fig, use_container_width=True)
+    m1.metric("主队列供者", len(donors))
+    m2.metric("图谱捕获细胞", f"{len(cells):,}")
+    m3.metric("二级细胞状态", cells.atlas_level2.nunique())
+    m4.metric("供者年龄范围", f"{donors.age_years.min():g}–{donors.age_years.max():g} 岁")
+    st.caption(
+        "donor17：GEO 原始年龄 21 months，换算为 1.75 岁。页面、年龄覆盖统计和下载数据使用同一年龄表。"
+        "细胞比例描述捕获的细胞库；原取样包含约 6:4 的 CD45+/CD45− 重组，不代表完整胸腺组织比例。"
+    )
+    atlas_tab, donor_tab, download_tab = st.tabs(TABS)
 
-with hierarchy_tab:
-    st.markdown('<div class="section-label">Three-level annotation</div>', unsafe_allow_html=True)
-    st.subheader("Move from robust donor inference to fine atlas states")
-    st.caption("Level 1 remains the primary donor-level label. Levels 2 and 3 are an audited atlas layer; coverage status does not establish biological validity by itself.")
-    if hierarchy_umap.empty:
-        st.warning("Biology atlas v2 tables are not available. Run analysis/biology_atlas_v2/build_biology_atlas_v2.py.")
-    else:
-        color_level = st.radio("Color UMAP by", ["atlas_level1", "atlas_level2", "atlas_level3"], horizontal=True)
-        max_points = min(40000, len(hierarchy_umap))
-        sampled = hierarchy_umap.sample(max_points, random_state=371) if len(hierarchy_umap) > max_points else hierarchy_umap
-        fig = px.scatter(sampled, x="umap_1", y="umap_2", color=color_level,
-                         render_mode="webgl", opacity=.65,
-                         labels={"umap_1": "UMAP 1", "umap_2": "UMAP 2", color_level: color_level.replace("atlas_", "").replace("_", " ").title()})
-        fig.update_traces(marker={"size": 2.4})
-        fig.update_layout(height=620, margin=dict(l=10, r=10, t=20, b=10))
-        st.plotly_chart(fig, use_container_width=True)
-        left, right = st.columns(2)
+    with atlas_tab:
+        st.subheader("分层图谱浏览")
+        options = sorted(cells.atlas_level1.unique())
+        broad = st.multiselect("一级细胞标签", options, default=options)
+        view = cells.loc[cells.atlas_level1.isin(broad)].copy()
+        donor_options = donors.donor_id.tolist()
+        donor_filter = st.multiselect("供者筛选", donor_options, default=donor_options)
+        view = view.loc[view.donor_id.isin(donor_filter)]
+        color_options = {"一级标签": "atlas_level1", "二级状态": "atlas_level2",
+                         "三级细分状态": "atlas_level3", "供者": "donor_id", "年龄": "age_years"}
+        color_label = st.radio("图谱着色", list(color_options), horizontal=True)
+        color = color_options[color_label]
+        if view.empty:
+            st.info("当前筛选没有细胞，请选择细胞标签和供者。")
+        else:
+            limit = st.select_slider("最多绘制的细胞点", options=[5000, 10000, 20000, 40000], value=20000)
+            plotted = view.sample(limit, random_state=371) if len(view) > limit else view
+            figure = px.scatter(
+                plotted, x="umap_1", y="umap_2", color=color, render_mode="webgl",
+                hover_data=["donor_id", "age_years", "sex", *LEVELS],
+                labels={"umap_1": "UMAP 1", "umap_2": "UMAP 2", "age_years": "年龄（岁）"},
+                opacity=.65, color_continuous_scale="Teal",
+            )
+            figure.update_traces(marker={"size": 2.5})
+            figure.update_layout(height=610, margin=dict(l=10, r=10, t=10, b=10))
+            st.plotly_chart(figure, use_container_width=True)
+            st.caption(f"筛选细胞 {len(view):,} 个；绘制 {len(plotted):,} 个。下面的覆盖统计使用全部筛选细胞。")
+            level = st.selectbox("查看标签覆盖", LEVELS, index=1)
+            st.dataframe(coverage(view, level), use_container_width=True, hide_index=True)
+            st.caption("标签来自现有图谱注释；供者覆盖和年龄范围帮助判断数据可用性，不替代标记基因验证。")
+
+    with donor_tab:
+        st.subheader("供者级证据查询")
+        selected = st.selectbox("选择供者", donors.donor_id.tolist(),
+                                index=donors.donor_id.tolist().index("donor17"))
+        donor = donors.loc[donors.donor_id.eq(selected)].iloc[0]
+        selected_cells = cells.loc[cells.donor_id.eq(selected)]
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("年龄", f"{donor.age_years:g} 岁")
+        c2.metric("性别", str(donor.sex))
+        c3.metric("该供者图谱细胞", f"{len(selected_cells):,}")
+        qc = donor.get("total_cells_postQC")
+        c4.metric("源记录 QC 后细胞", "NA" if pd.isna(qc) else f"{int(qc):,}")
+        if selected == "donor17":
+            st.info("年龄单位已核正：21 months ÷ 12 = 1.75 岁。")
+            st.markdown(f"[查看 donor17 的 GEO 来源]({GEO_DONOR17})")
+
+        left, right = st.columns([1, 1.35])
         with left:
-            st.markdown("#### Level 2 donor coverage")
-            st.dataframe(hierarchy_level2, use_container_width=True, hide_index=True, height=410)
+            fields = [
+                "gsm_ids", "platform", "sample_preparation", "n_thymus_libraries",
+                "has_replicate_libraries", "total_cells_preQC", "total_cells_postQC",
+                "included_primary_analysis", "age_source_raw", "age_unit_status",
+                "diagnosis", "surgical_collection_indication", "library_batch", "sequencing_batch",
+            ]
+            metadata = pd.DataFrame({
+                "字段": fields,
+                "值": ["未提供" if pd.isna(donor.get(field)) or str(donor.get(field, "")) == ""
+                       else str(donor.get(field)) for field in fields],
+            })
+            st.dataframe(metadata, use_container_width=True, hide_index=True)
         with right:
-            st.markdown("#### Level 3 analysis gate")
-            status = st.multiselect("Status", sorted(hierarchy_level3["analysis_status"].dropna().unique()),
-                                    default=sorted(hierarchy_level3["analysis_status"].dropna().unique()))
-            st.dataframe(hierarchy_level3.loc[hierarchy_level3["analysis_status"].isin(status)],
-                         use_container_width=True, hide_index=True, height=410)
+            st.markdown("#### 捕获细胞组成")
+            counts = donor_counts(cells)
+            selected_counts = counts.loc[counts.donor_id.eq(selected)]
+            if selected_counts.empty:
+                st.info("当前图谱中没有该供者的细胞记录。")
+            else:
+                chart = px.bar(
+                    selected_counts.sort_values("fraction_of_captured_atlas", ascending=False),
+                    x="atlas_level2", y="fraction_of_captured_atlas", color="atlas_level1",
+                    hover_data=["n_cells", "captured_atlas_denominator"],
+                    labels={"atlas_level2": "细胞状态", "fraction_of_captured_atlas": "占该供者捕获图谱细胞的比例"},
+                )
+                chart.update_layout(height=420, legend_title_text="")
+                st.plotly_chart(chart, use_container_width=True)
 
-with thymocyte_tab:
-    st.markdown('<div class="section-label">Developmental atlas</div>', unsafe_allow_html=True)
-    st.subheader("Thymocyte states across donor age")
-    st.caption("Fractions use the recovered T-lineage pool as the denominator and are exploratory; they are not native whole-thymus abundances.")
-    t_fraction = level2_fractions.loc[level2_fractions["family"].eq("T lineage")].copy()
-    if t_fraction.empty:
-        st.warning("Thymocyte v2 tables are not available.")
-    else:
-        default_states = [x for x in ["Early DN-like", "Cycling DN", "Cycling DP", "Quiescent DP", "CD4 SP", "CD8 SP"] if x in t_fraction["atlas_level2"].unique()]
-        states = st.multiselect("States", sorted(t_fraction["atlas_level2"].unique()), default=default_states)
-        shown = t_fraction.loc[t_fraction["atlas_level2"].isin(states)]
-        fig = px.scatter(shown, x="age_years", y="within_lineage_fraction", color="atlas_level2",
-                         trendline="ols", hover_data=["donor_id", "sex", "n_cells", "lineage_denominator"],
-                         labels={"age_years": "Age years", "within_lineage_fraction": "Fraction within recovered T lineage", "atlas_level2": "State"})
-        fig.update_layout(height=520, legend_title_text="")
+        st.markdown("#### 同一细胞状态在各供者中的覆盖")
+        pairs = sorted(set(zip(cells.atlas_level1, cells.atlas_level2)))
+        pair_options = {" / ".join(item): item for item in pairs}
+        pair = pair_options[st.selectbox("细胞状态", list(pair_options))]
+        selected_state = cells.loc[cells.atlas_level1.eq(pair[0]) & cells.atlas_level2.eq(pair[1])]
+        state_counts = selected_state.groupby("donor_id").size()
+        totals = cells.groupby("donor_id").size()
+        comparison = donors[["donor_id", "age_years", "sex"]].copy()
+        comparison["n_cells"] = comparison.donor_id.map(state_counts).fillna(0).astype(int)
+        comparison["captured_atlas_denominator"] = comparison.donor_id.map(totals)
+        comparison["fraction_of_captured_atlas"] = comparison.n_cells / comparison.captured_atlas_denominator
+        comparison["selected_donor"] = comparison.donor_id.eq(selected)
+        comparison["point_size"] = comparison.selected_donor.map({True: 12, False: 6})
+        fig = px.scatter(
+            comparison, x="age_years", y="fraction_of_captured_atlas", color="selected_donor",
+            size="point_size", size_max=14,
+            hover_data=["donor_id", "sex", "n_cells", "captured_atlas_denominator"],
+            labels={"age_years": "年龄（岁）", "fraction_of_captured_atlas": "占该供者捕获细胞的比例",
+                    "selected_donor": "当前供者"},
+        )
+        fig.update_layout(height=360)
         st.plotly_chart(fig, use_container_width=True)
-        st.markdown("#### Exploratory sex-adjusted models")
-        st.dataframe(level2_models.loc[level2_models["family"].eq("T lineage")], use_container_width=True, hide_index=True)
+        st.dataframe(comparison.drop(columns=["point_size"]), use_container_width=True, hide_index=True)
+        st.caption("每个点是一位供者。此处显示描述性组成，不将细胞视为独立生物学重复，也不展示未校正的年龄效应。")
+        st.download_button("下载当前供者元数据", csv_bytes(donors.loc[donors.donor_id.eq(selected)]),
+                           file_name=f"{selected}_metadata.csv", mime="text/csv")
+        st.download_button("下载当前供者细胞组成", csv_bytes(donor_counts(cells).query("donor_id == @selected")),
+                           file_name=f"{selected}_cellstate_counts.csv", mime="text/csv")
 
-with niche_tab:
-    st.markdown('<div class="section-label">Epithelial and stromal niche</div>', unsafe_allow_html=True)
-    st.subheader("TEC stromal vascular and myeloid compartments")
-    st.caption("TEC fractions are calculated within recovered TEC; stromal fractions are calculated within the recovered fibroblast/endothelial pool.")
-    niche_fraction = level2_fractions.loc[level2_fractions["family"].isin(["TEC", "Stromal vascular", "Myeloid"])].copy()
-    if niche_fraction.empty:
-        st.warning("Niche v2 tables are not available.")
-    else:
-        families = st.multiselect("Compartment", ["TEC", "Stromal vascular", "Myeloid"], default=["TEC", "Stromal vascular"])
-        shown = niche_fraction.loc[niche_fraction["family"].isin(families)]
-        fig = px.scatter(shown, x="age_years", y="within_lineage_fraction", color="atlas_level2",
-                         facet_col="family", trendline="ols",
-                         hover_data=["donor_id", "sex", "n_cells", "lineage_denominator"],
-                         labels={"age_years": "Age years", "within_lineage_fraction": "Fraction within recovered compartment", "atlas_level2": "State"})
-        fig.update_layout(height=520, legend_title_text="")
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown("#### Exploratory sex-adjusted models")
-        st.dataframe(level2_models.loc[level2_models["family"].isin(families)], use_container_width=True, hide_index=True)
-with gene_tab:
-    st.markdown('<div class="section-label">Gene-level lookup</div>', unsafe_allow_html=True)
-    st.subheader("Follow one gene across evidence layers")
-    options = gene_summary["gene"].dropna().astype(str).sort_values().tolist()
-    selected_gene = st.selectbox("Gene symbol", options, index=options.index("FOXN1") if "FOXN1" in options else 0)
-    record = gene_summary.loc[gene_summary["gene"].eq(selected_gene)].iloc[0]
-    rows = effects.loc[effects["gene"].eq(selected_gene)].copy()
-    rows["direction"] = np.where(rows["logFC_age_perSD"].ge(0), "Age-up", "Age-down")
-    rows["significant_q05"] = rows["adj.P.Val"].lt(.05)
-    contexts = ["whole_thymus","TEC","Fibroblast","DP","SP_CD4","SP_CD8"]
-    for col, context in zip(st.columns(6), contexts):
-        row = rows.loc[rows["cell_context"].eq(context)]
-        col.metric(context, "NA" if row.empty else fmt(row.iloc[0]["logFC_age_perSD"]), None if row.empty else f"q={fmt(row.iloc[0]['adj.P.Val'])}; n={int(row.iloc[0]['n_donors'])}")
-    left, right = st.columns([1.35,1])
-    with left:
-        st.markdown("#### Age effects by cell context")
-        if not rows.empty:
-            fig = px.scatter(rows.sort_values("logFC_age_perSD"), x="logFC_age_perSD", y="cell_context", color="direction", symbol="significant_q05", hover_data={"adj.P.Val":":.3g","P.Value":":.3g","n_donors":True}, color_discrete_map={"Age-up":"#c95858","Age-down":"#315f91"}, labels={"logFC_age_perSD":"Sex-adjusted beta_age per 1 SD","cell_context":""})
-            fig.add_vline(x=0,line_color="#879395",line_width=1); fig.update_layout(height=430,legend_title_text="")
-            st.plotly_chart(fig,use_container_width=True)
-        st.dataframe(rows[["cell_context","logFC_age_perSD","P.Value","adj.P.Val","n_donors","direction"]].sort_values("adj.P.Val"),use_container_width=True,hide_index=True)
-    with right:
-        st.markdown("#### Integrated evidence")
-        labels = ["ML consensus selection","ML feature count","Transformer top-100","Best IG cell type","Best IG rank","Mouse RNA direction","Mouse RNA concordant","Mouse ATAC concordant","Developmental top state"]
-        keys = ["in_ML_consensus","ml_n_features","in_DL_top100","transformer_best_ig_celltype","transformer_best_ig_rank","mouse_RNA_direction","mouse_RNA_concordant","mouse_ATAC_concordant","developmental_top_stage"]
-        st.dataframe(pd.DataFrame({"Evidence":labels,"Value":[fmt(record.get(k)) for k in keys]}),use_container_width=True,hide_index=True)
-    st.markdown("#### Developmental localization"); dev=developmental.loc[developmental["gene"].astype(str).str.upper().eq(selected_gene)]
-    if dev.empty: st.caption("Not available in the current GSE195812 localization table.")
-    else: st.plotly_chart(px.bar(dev.sort_values("developmental_stage"),x="developmental_stage",y="mean_zscore",color="source_object",hover_data={"pct_expr":":.2f","n_cells":True},labels={"mean_zscore":"Mean within-object z-score","developmental_stage":"Stage"}),use_container_width=True)
-with cell_tab:
-    st.markdown('<div class="section-label">Cell-context view</div>',unsafe_allow_html=True); st.subheader("Composition and transcriptional evidence")
-    selected_cell=st.selectbox("Cell type",cell_summary["cell_type"].sort_values().tolist()); rec=cell_summary.loc[cell_summary["cell_type"].eq(selected_cell)].iloc[0]
-    metrics=st.columns(5); metrics[0].metric("Composition beta_age",fmt(rec.get("composition_age_effect"))); metrics[1].metric("Composition q",fmt(rec.get("composition_q_value_BH"))); metrics[2].metric("Age-up genes",int(rec.get("n_age_up_q05",0))); metrics[3].metric("Age-down genes",int(rec.get("n_age_down_q05",0))); metrics[4].metric("Donor coverage",f"{int(rec.get('min_donor_coverage',0))}-{int(rec.get('max_donor_coverage',0))}")
-    st.caption("Composition effect is a sex-adjusted CLR association within captured libraries; it does not estimate intact-thymus abundance.")
-    sig=cell_genes.loc[(cell_genes["cell_context"].eq(selected_cell))&(cell_genes["direction"].ne("not_significant"))]
-    left,right=st.columns([1.35,1])
-    with left: st.markdown("#### Significant age-associated genes"); st.dataframe(sig[["gene","direction","logFC_age_perSD","adj.P.Val","P.Value","n_donors"]].sort_values(["direction","adj.P.Val"]),use_container_width=True,hide_index=True,height=470)
-    with right:
-        st.markdown("#### Top Gene × CellType predictors"); predictors=str(rec.get("top_gene_celltype_predictors","")).split("; "); pred=gene_summary.loc[gene_summary["gene"].isin(predictors)]
-        if pred.empty:
-            st.caption("No Transformer token was available for this cell type.")
-        else:
-            st.dataframe(pred[["gene","transformer_best_ig_rank","transformer_best_ig_importance","in_ML_consensus"]].sort_values("transformer_best_ig_rank"),use_container_width=True,hide_index=True)
-with donor_tab:
-    st.markdown('<div class="section-label">Donor-resolved view</div>',unsafe_allow_html=True); st.subheader("Metadata, QC and out-of-fold prediction")
-    selected=st.selectbox("Donor",donors["donor_id"].astype(str).sort_values().tolist()); donor=donors.loc[donors["donor_id"].astype(str).eq(selected)].iloc[0]
-    metrics=st.columns(6); metrics[0].metric("Age",f"{fmt(donor.get('age_years'))} y"); metrics[1].metric("Sex",fmt(donor.get("sex"))); metrics[2].metric("Post-QC cells",fmt(donor.get("total_cells_postQC"))); metrics[3].metric("OOF predicted age",fmt(donor.get("elasticnet_OOF_predicted_age"))); metrics[4].metric("Absolute error",fmt(donor.get("absolute_error"))); metrics[5].metric("Age-adjusted deviation",fmt(donor.get("thymic_age_deviation_years")))
-    left,right=st.columns([1,1.3])
-    with left:
-        fields=["gsm_ids","platform","sample_preparation","total_cells_preQC","total_cells_postQC","n_thymus_libraries","has_replicate_libraries","included_primary_analysis","composition_status"]
-        st.markdown("#### Metadata and QC"); st.dataframe(pd.DataFrame({"Field":fields,"Value":[fmt(donor.get(f)) for f in fields]}),use_container_width=True,hide_index=True)
-    with right:
-        st.markdown("#### Captured-library cell composition"); comp=donor_composition.loc[donor_composition["donor_id"].astype(str).eq(selected)].copy(); comp["captured_fraction"]=pd.to_numeric(comp.get("captured_fraction"),errors="coerce"); comp=comp.dropna(subset=["captured_fraction"])
-        if comp.empty: st.warning("The donor-level composition source table is not present in the local bundle. Run export_server_inputs.py on the analysis server, then rebuild the release.")
-        else: st.plotly_chart(px.bar(comp.sort_values("captured_fraction",ascending=False),x="cell_type",y="captured_fraction",labels={"captured_fraction":"Fraction of captured QC-passed cells","cell_type":""},color_discrete_sequence=["#0b756d"]),use_container_width=True)
-with age_tab:
-    render_age_research(ROOT)
-with predict_tab:
-    render_new_sample_predictor(ROOT)
-with download_tab:
-    st.markdown('<div class="section-label">Open-science release</div>',unsafe_allow_html=True); st.subheader("Files, cohorts and provenance")
-    st.dataframe(cohorts,use_container_width=True,hide_index=True); st.caption("Only GSE231906 is included in release v1. Candidate external cohorts remain excluded until unique-donor, age, health, preparation and overlap audits are complete.")
-    downloadable=sorted(DATA.glob("*"))+sorted(MANIFEST.glob("*"))+sorted((ROOT/"release"/"source_files").glob("*"))+sorted((ROOT/"release"/"figures").glob("*"))
-    downloadable=[p for p in downloadable if not any(term in p.name.lower() for term in ("pathway", "enrich", "hallmark", "cellchat", "communication"))]; columns=st.columns(3)
-    for i,path in enumerate(downloadable): columns[i%3].download_button(label=f"Download {path.name}",data=path.read_bytes(),file_name=path.name,mime="application/octet-stream",key=f"download_{path.name}")
-    st.markdown("#### Image credits"); st.markdown("- **Healthy Human T Cell** — NIAID/NIH, public domain, via Wikimedia Commons.\n- **Thymus Lobule** — Human Reference Atlas / NIAID NIH BioArt, CC BY 4.0, via Wikimedia Commons.\n\nBoth images are visual context only; neither is a result from this study.")
-with contribute_tab:
-    st.markdown('<div class="section-label">Community datasets · session-only preview</div>', unsafe_allow_html=True)
-    st.subheader("Contribute standardized results")
-    st.info("This page validates and packages a dataset during your web session. Uploads are transferred to the website server's memory; this app does not save a persistent server copy, forward files to the maintainers, or change the official v1.0-18donor Atlas.")
-    st.warning("Upload only de-identified, shareable summary data. Do not upload controlled-access human data, names, dates of birth, contact details, clinical records, FASTQ, H5AD, or raw sequencing files. A checkbox cannot verify de-identification.")
-    st.markdown("Use the three templates below; field definitions are in `schemas/README.md`. Each file is limited to 10 MiB and 200,000 rows.")
-    template_columns = st.columns(3)
-    for index, name in enumerate(EXPECTED_FILES):
-        template = ROOT / "schemas" / f"community_{name.removesuffix('.csv')}_template.csv"
-        template_columns[index].download_button(f"Download {name} template", template.read_bytes(),
-                                                file_name=name, mime="text/csv", key=f"template_{name}")
-    upload_columns = st.columns(3)
-    uploaded = {
-        name: upload_columns[index].file_uploader(name, type=["csv"], key=f"community_{name}")
-        for index, name in enumerate(EXPECTED_FILES)
-    }
-    raw_files = {name: item.getvalue() for name, item in uploaded.items() if item is not None}
-    signature = sha256(b"".join(name.encode() + b"\0" + raw_files[name] for name in sorted(raw_files))).hexdigest()
-    session_store = SessionSubmissionStore(st.session_state)
-    previous = session_store.load()
-    if previous and previous["signature"] != signature:
-        session_store.clear()
-    manual_map = {}
-    if len(raw_files) == len(EXPECTED_FILES) and all(len(raw) <= MAX_FILE_BYTES for raw in raw_files.values()):
-        preliminary = validate_submission(raw_files)
-        unresolved = preliminary.mappings.loc[preliminary.mappings["mapped_label"].eq(""), "submitted_label"].tolist()
-        if unresolved:
-            st.markdown("#### Resolve cell-type labels")
-            st.caption("Map only biologically equivalent labels. If no equivalent exists, revise your CSV or discuss it during manual review.")
-            for label in unresolved:
-                manual_map[label] = st.selectbox(f"Map {label}", ["Select a label", *ALLOWED_CELL_TYPES, "whole_thymus"], key=f"map_{label}")
-            manual_map = {label: target for label, target in manual_map.items() if target != "Select a label"}
-        st.markdown("#### Cell-type mapping preview")
-        preview = validate_submission(raw_files, manual_map)
-        st.dataframe(preview.mappings, use_container_width=True, hide_index=True)
-    else:
-        preview = None
-    consent = st.checkbox("I confirm that I am authorized to share these files and that they contain no direct identifiers or controlled-access human data.", key="community_consent")
-    if st.button("Validate and prepare submission package", disabled=not consent or len(raw_files) != len(EXPECTED_FILES), type="primary"):
-        submission_id = "CSA-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + uuid4().hex[:8].upper()
-        result = validate_submission(raw_files, manual_map)
-        session_store.save({"id": submission_id, "signature": signature, "result": result,
-                            "package": make_download_package(submission_id, result) if result.valid else None})
-    saved = session_store.load()
-    if saved:
-        result = saved["result"]
-        st.markdown("#### Validation report")
-        st.write(f"Submission ID: **{saved['id']}**")
-        st.write("**Submitted (this session) → Automated validation → " +
-                 ("Pending manual review (package ready; not delivered)" if result.valid else "Needs correction" ) + "**")
-        st.json(result.summary)
-        if result.issues:
-            st.dataframe(pd.DataFrame(result.issues), use_container_width=True, hide_index=True)
-        else:
-            st.success("All automated checks passed. Human review is still required before any community listing.")
-        if result.valid:
-            st.markdown("#### Normalized preview")
-            for name in EXPECTED_FILES:
-                st.caption(name)
-                st.dataframe(result.tables[name].head(20), use_container_width=True, hide_index=True)
-            st.download_button("Download normalized results and validation report", saved["package"],
-                               file_name=f"{saved['id']}.zip", mime="application/zip")
-        if st.button("Clear this session's submission"):
-            session_store.clear()
-            st.rerun()
-st.markdown('<div class="footer">Human Thymic Aging Atlas · donor-resolved research resource · <a href="https://github.com/12306-po/Human-Thymic-Aging-Atlas" target="_blank">GitHub source repository</a></div>',unsafe_allow_html=True)
+    with download_tab:
+        st.subheader("结果与代码下载")
+        st.write("下载与当前页面一致的修正供者表、图谱坐标、分层覆盖和供者级细胞组成。")
+        files = download_data(donors, cells)
+        source = source_files(ROOT)
+        a, b, c = st.columns(3)
+        a.download_button("下载结果数据包", zip_bytes(files),
+                          file_name="thymus_atlas_core_results.zip", mime="application/zip")
+        b.download_button("下载网站源代码", zip_bytes(source),
+                          file_name="thymus_atlas_core_code.zip", mime="application/zip")
+        c.download_button("下载完整复现包", zip_bytes({**files, **source}),
+                          file_name="thymus_atlas_core_reproducible.zip", mime="application/zip")
+        with st.expander("下载单独的供者表与覆盖表"):
+            st.download_button("修正后的供者表 CSV", csv_bytes(donors),
+                               file_name="donor_metadata_corrected.csv", mime="text/csv")
+            for level in LEVELS:
+                st.download_button(f"{level} 覆盖表 CSV", csv_bytes(coverage(cells, level)),
+                                   file_name=f"{level}_coverage.csv", mime="text/csv")
+        st.markdown("#### 版本与数据来源")
+        st.write("donor17 的原始记录为 21 months；当前版本统一换算为 1.75 岁。")
+        st.write("当前下载包不包含旧年龄训练的预测、误差、年龄偏差，也不包含尚未导入修正版本的年龄关联结果。")
+        st.markdown(f"[GEO donor17]({GEO_DONOR17}) · [GSE231906](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE231906)")
+        st.markdown("[网站源码与版本历史](https://github.com/12306-po/Human-Thymic-Aging-Atlas)")
+        st.caption("复现：解压完整复现包，安装 requirements-core.txt，然后执行 streamlit run app.py。")
+
+    st.caption("Human Thymic Aging Atlas · 供者级研究资源")
+
+
+if __name__ == "__main__":
+    main()

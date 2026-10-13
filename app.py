@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from hashlib import sha256
+import json
+from urllib.parse import quote
 
 import pandas as pd
 import plotly.express as px
@@ -10,9 +13,13 @@ from atlas_core_data import (
     GEO_DONOR17, LEVELS, coverage, csv_bytes, donor_counts,
     load_core, result_files, source_files, zip_bytes,
 )
+from atlas_gene_data import (
+    corrected_evidence_files, corrected_gene_effects, gene_references, reference_files,
+)
 
 ROOT = Path(__file__).resolve().parent
 TABS = ["图谱浏览 · Atlas", "供者级证据查询 · Donors", "结果与代码下载 · Downloads"]
+PALETTE = ["#0b756d", "#c95858", "#315f91", "#6e9b89", "#d7a14b", "#9477a8", "#5e9ca0"]
 
 
 @st.cache_data(show_spinner=False)
@@ -22,23 +29,135 @@ def core_data():
 
 @st.cache_data(show_spinner=False)
 def download_data(donors, cells):
-    return result_files(donors, cells)
+    files = result_files(donors, cells)
+    files.update(reference_files(*gene_references(ROOT)))
+    files.update(corrected_evidence_files(ROOT))
+    manifest_path = "release/core_v1/manifest.json"
+    manifest = json.loads(files[manifest_path])
+    manifest["gene_reference_scope"] = "Expression summaries and external developmental localization, not old age statistics"
+    manifest["file_sha256"] = {name: sha256(data).hexdigest() for name, data in files.items() if name != manifest_path}
+    files[manifest_path] = json.dumps(manifest, indent=2, ensure_ascii=False).encode("utf-8")
+    return files
+
+
+@st.cache_data(show_spinner=False)
+def gene_data():
+    return gene_references(ROOT)
+
+
+def render_gene_browser():
+    st.subheader("基因查询")
+    index, expression, development = gene_data()
+    options = index.gene.tolist()
+    if not options:
+        st.info("当前版本没有基因参考表。")
+        return
+    requested = str(st.query_params.get("gene", "")).upper()
+    default = requested if requested in options else ("CD3D" if "CD3D" in options else options[0])
+    selected_gene = st.selectbox("基因符号", options, index=options.index(default), key="gene_symbol")
+    st.markdown(f"[分享当前基因查询](?view=gene&gene={quote(selected_gene, safe='')})")
+    gene_expression = expression.loc[expression.gene.eq(selected_gene)].copy()
+    dev = development.loc[development.gene.eq(selected_gene)].copy()
+    st.caption(f"索引包含 {len(options):,} 个基因。输入基因符号可检索表达参考、供者覆盖和发育定位。")
+    left, right = st.columns([1.1, 1])
+    with left:
+        st.markdown("#### 各细胞类型的表达参考")
+        if gene_expression.empty:
+            st.info("该基因没有可用的表达汇总。")
+        else:
+            fig = px.bar(
+                gene_expression.sort_values("AveExpr", ascending=False),
+                x="cell_context", y="AveExpr", color="cell_context",
+                hover_data=["n_donors", "analysis_level"], color_discrete_sequence=PALETTE,
+                labels={"cell_context": "源表细胞类型", "AveExpr": "AveExpr（源表表达汇总值）"},
+            )
+            fig.update_layout(showlegend=False, height=390)
+            st.plotly_chart(fig, use_container_width=True)
+            st.dataframe(gene_expression, use_container_width=True, hide_index=True)
+        st.caption("这里保留表达汇总与供者覆盖，使用原分析的粗粒度细胞标签；未展示旧年龄模型的 beta、P 值或 FDR。")
+    with right:
+        st.markdown("#### T 细胞发育阶段定位")
+        if dev.empty:
+            st.info("当前发育参考仅覆盖既有候选基因，该基因尚未覆盖。")
+        else:
+            metrics = {"标准化表达": "mean_zscore", "表达汇总": "mean_expr", "检出比例（%）": "pct_expr"}
+            chosen = st.radio("发育定位指标", list(metrics), horizontal=True)
+            fig = px.line(
+                dev, x="developmental_stage", y=metrics[chosen], color="source_object", markers=True,
+                category_orders={"developmental_stage": ["DN1", "DN2", "DN3", "ISP", "DP_CD3min", "DP_CD3plus"]},
+                color_discrete_sequence=PALETTE,
+                labels={"developmental_stage": "发育阶段", metrics[chosen]: chosen, "source_object": "参考对象"},
+                hover_data=["n_cells", "pct_expr"],
+            )
+            fig.update_layout(height=390)
+            st.plotly_chart(fig, use_container_width=True)
+            st.dataframe(dev.drop(columns=["evidence_scope"]), use_container_width=True, hide_index=True)
+        st.caption("发育定位来自外部人类发育参考；覆盖范围不代表修正后的衰老筛选结果，定位曲线也不是年龄轨迹。")
+    st.markdown("#### 修正后的供者级年龄关联")
+    try:
+        effects = corrected_gene_effects(ROOT)
+    except (OSError, ValueError, KeyError) as exc:
+        st.error(f"年龄关联数据未通过来源校验：{exc}")
+        effects = None
+    if effects is None:
+        st.info("修正年龄后的基因关联结果尚未导入网站。表达参考可正常查询；年龄效应将在核验新版分析后显示。")
+    else:
+        rows = effects.loc[effects.gene.eq(selected_gene)]
+        if rows.empty:
+            st.info("修正后的年龄关联表没有该基因。")
+        else:
+            st.dataframe(rows.sort_values("q"), use_container_width=True, hide_index=True)
+            st.caption("统计单元为供者。beta 使用源模型尺度；此表的显著性不等于已通过 HC3 或影响供者稳定性审计。")
+    st.download_button("下载当前基因表达参考", csv_bytes(gene_expression),
+                       file_name=f"{selected_gene}_expression_reference.csv", mime="text/csv")
+    if not dev.empty:
+        st.download_button("下载当前基因发育定位", csv_bytes(dev),
+                           file_name=f"{selected_gene}_development_reference.csv", mime="text/csv")
 
 
 def main():
     st.set_page_config(page_title="Human Thymic Aging Atlas", page_icon="🧬", layout="wide")
     st.markdown("""
     <style>
-    .stApp {background:#f7faf9;}
-    .block-container {max-width:1280px;padding-top:1.6rem;}
-    h1,h2,h3 {color:#163d3b;}
-    div[data-testid="stMetric"] {background:#fff;border:1px solid #dce8e4;border-radius:12px;padding:12px;}
-    .stTabs [data-baseweb="tab-list"] {gap:14px;}
-    .stTabs [data-baseweb="tab"] {height:50px;}
+    :root {--ink:#102a2d;--muted:#5d7072;--teal:#0b756d;}
+    .stApp {background:radial-gradient(circle at 8% 0%,rgba(93,189,169,.16),transparent 28rem),radial-gradient(circle at 98% 8%,rgba(88,129,180,.12),transparent 32rem),#fbfdfc;}
+    .block-container {max-width:1280px;padding-top:1.5rem;padding-bottom:3rem;}
+    h1,h2,h3 {color:var(--ink);letter-spacing:-.02em;}
+    .hero-panel {min-height:350px;padding:2rem 2.2rem;border-radius:26px;background:linear-gradient(135deg,#ffffffed,#eef8f5);border:1px solid #d0e4dd;box-shadow:0 20px 55px #23504c13;}
+    .hero-kicker {display:inline-flex;padding:.4rem .75rem;border-radius:999px;color:#08665f;background:#dff3ec;font-size:.78rem;font-weight:700;letter-spacing:.05em;}
+    .hero-title {font-size:clamp(2.2rem,4.2vw,3.65rem);line-height:1.16;margin:1rem 0;font-weight:760;}
+    .hero-copy {font-size:1.02rem;line-height:1.8;color:var(--muted);}
+    .pill-row {display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;}
+    .pill {padding:.38rem .65rem;border-radius:999px;background:white;border:1px solid #d7e5e1;color:#38585a;font-size:.78rem;}
+    .image-credit {font-size:.72rem;color:#78888a;line-height:1.5;margin-top:.3rem;}
+    div[data-testid="stImage"] img {border-radius:22px;}
+    div[data-testid="stMetric"] {background:#ffffffdd;border:1px solid #dde8e5;padding:.9rem 1rem;border-radius:16px;box-shadow:0 8px 22px #2246430d;}
+    .stTabs [data-baseweb="tab-list"] {gap:.35rem;background:#edf4f2;padding:.35rem;border-radius:14px;margin-top:1rem;}
+    .stTabs [data-baseweb="tab"] {height:2.85rem;border-radius:10px;padding:0 1rem;color:#486163;}
+    .stTabs [aria-selected="true"] {background:white;color:#075f59;box-shadow:0 4px 14px #1e504a14;}
+    div[data-testid="stDataFrame"] {border:1px solid #e0e8e6;border-radius:14px;overflow:hidden;}
     </style>
     """, unsafe_allow_html=True)
-    st.title("人胸腺单细胞图谱与供者证据查询")
-    st.caption("Human Thymic Aging Atlas · GSE231906 · 分层标签、供者覆盖与可复现的数据")
+    hero_left, hero_right = st.columns([1.35, .65], gap="large")
+    with hero_left:
+        st.markdown(
+            '<div class="hero-panel"><span class="hero-kicker">HUMAN THYMIC AGING ATLAS</span>'
+            '<div class="hero-title">人胸腺单细胞图谱<br>与供者证据查询</div>'
+            '<div class="hero-copy">从细胞状态到基因表达，从供者覆盖到数据来源。'
+            '探索分层注释、表达参考和供者级证据，下载可复现的数据与代码。</div>'
+            '<div class="pill-row"><span class="pill">GSE231906</span>'
+            '<span class="pill">3 个核心入口</span><span class="pill">细胞与基因浏览</span>'
+            '<span class="pill">可追溯来源</span></div></div>', unsafe_allow_html=True,
+        )
+    with hero_right:
+        image = ROOT / "assets/healthy_human_t_cell.jpg"
+        if image.is_file():
+            st.image(str(image), use_column_width=True)
+            st.markdown(
+                '<div class="image-credit">健康人 T 淋巴细胞显微图 · NIAID/NIH，公共领域。'
+                '用于视觉示意，不是本研究结果。</div>', unsafe_allow_html=True,
+            )
+    st.write("")
 
     try:
         donors, cells = core_data()
@@ -58,35 +177,50 @@ def main():
     atlas_tab, donor_tab, download_tab = st.tabs(TABS)
 
     with atlas_tab:
-        st.subheader("分层图谱浏览")
-        options = sorted(cells.atlas_level1.unique())
-        broad = st.multiselect("一级细胞标签", options, default=options)
-        view = cells.loc[cells.atlas_level1.isin(broad)].copy()
-        donor_options = donors.donor_id.tolist()
-        donor_filter = st.multiselect("供者筛选", donor_options, default=donor_options)
-        view = view.loc[view.donor_id.isin(donor_filter)]
-        color_options = {"一级标签": "atlas_level1", "二级状态": "atlas_level2",
-                         "三级细分状态": "atlas_level3", "供者": "donor_id", "年龄": "age_years"}
-        color_label = st.radio("图谱着色", list(color_options), horizontal=True)
-        color = color_options[color_label]
-        if view.empty:
-            st.info("当前筛选没有细胞，请选择细胞标签和供者。")
+        intro_left, intro_right = st.columns([.6, 1.4], gap="large")
+        with intro_left:
+            lobule = ROOT / "assets/thymus_lobule_nih_bioart.svg"
+            if lobule.is_file():
+                st.image(str(lobule), use_column_width=True)
+                st.caption("胸腺小叶示意 · Human Reference Atlas / NIAID NIH BioArt · CC BY 4.0。非研究数据。")
+        with intro_right:
+            st.markdown("### 从细胞状态到基因表达")
+            st.write("细胞图谱展示分层标签与供者覆盖；基因查询展示表达汇总、发育阶段定位和经过核验的年龄关联。")
+            st.caption("基因浏览位于图谱入口内部，网站仍保留三个核心功能。")
+        gene_view = st.query_params.get("view") == "gene" or bool(st.query_params.get("gene"))
+        mode = st.radio("浏览内容", ["细胞图谱", "基因查询"], index=1 if gene_view else 0, horizontal=True)
+        if mode == "基因查询":
+            render_gene_browser()
         else:
-            limit = st.select_slider("最多绘制的细胞点", options=[5000, 10000, 20000, 40000], value=20000)
-            plotted = view.sample(limit, random_state=371) if len(view) > limit else view
-            figure = px.scatter(
-                plotted, x="umap_1", y="umap_2", color=color, render_mode="webgl",
-                hover_data=["donor_id", "age_years", "sex", *LEVELS],
-                labels={"umap_1": "UMAP 1", "umap_2": "UMAP 2", "age_years": "年龄（岁）"},
-                opacity=.65, color_continuous_scale="Teal",
-            )
-            figure.update_traces(marker={"size": 2.5})
-            figure.update_layout(height=610, margin=dict(l=10, r=10, t=10, b=10))
-            st.plotly_chart(figure, use_container_width=True)
-            st.caption(f"筛选细胞 {len(view):,} 个；绘制 {len(plotted):,} 个。下面的覆盖统计使用全部筛选细胞。")
-            level = st.selectbox("查看标签覆盖", LEVELS, index=1)
-            st.dataframe(coverage(view, level), use_container_width=True, hide_index=True)
-            st.caption("标签来自现有图谱注释；供者覆盖和年龄范围帮助判断数据可用性，不替代标记基因验证。")
+            st.subheader("分层图谱浏览")
+            options = sorted(cells.atlas_level1.unique())
+            broad = st.multiselect("一级细胞标签", options, default=options)
+            view = cells.loc[cells.atlas_level1.isin(broad)].copy()
+            donor_options = donors.donor_id.tolist()
+            donor_filter = st.multiselect("供者筛选", donor_options, default=donor_options)
+            view = view.loc[view.donor_id.isin(donor_filter)]
+            color_options = {"一级标签": "atlas_level1", "二级状态": "atlas_level2",
+                             "三级细分状态": "atlas_level3", "供者": "donor_id", "年龄": "age_years"}
+            color_label = st.radio("图谱着色", list(color_options), horizontal=True)
+            color = color_options[color_label]
+            if view.empty:
+                st.info("当前筛选没有细胞，请选择细胞标签和供者。")
+            else:
+                limit = st.select_slider("最多绘制的细胞点", options=[5000, 10000, 20000, 40000], value=20000)
+                plotted = view.sample(limit, random_state=371) if len(view) > limit else view
+                figure = px.scatter(
+                    plotted, x="umap_1", y="umap_2", color=color, render_mode="webgl",
+                    hover_data=["donor_id", "age_years", "sex", *LEVELS],
+                    labels={"umap_1": "UMAP 1", "umap_2": "UMAP 2", "age_years": "年龄（岁）"},
+                    opacity=.65, color_continuous_scale="Teal", color_discrete_sequence=PALETTE,
+                )
+                figure.update_traces(marker={"size": 2.5})
+                figure.update_layout(height=610, margin=dict(l=10, r=10, t=10, b=10))
+                st.plotly_chart(figure, use_container_width=True)
+                st.caption(f"筛选细胞 {len(view):,} 个；绘制 {len(plotted):,} 个。下面的覆盖统计使用全部筛选细胞。")
+                level = st.selectbox("查看标签覆盖", LEVELS, index=1)
+                st.dataframe(coverage(view, level), use_container_width=True, hide_index=True)
+                st.caption("标签来自现有图谱注释；供者覆盖和年龄范围帮助判断数据可用性，不替代标记基因验证。")
 
     with donor_tab:
         st.subheader("供者级证据查询")
@@ -128,7 +262,7 @@ def main():
                 chart = px.bar(
                     selected_counts.sort_values("fraction_of_captured_atlas", ascending=False),
                     x="atlas_level2", y="fraction_of_captured_atlas", color="atlas_level1",
-                    hover_data=["n_cells", "captured_atlas_denominator"],
+                    hover_data=["n_cells", "captured_atlas_denominator"], color_discrete_sequence=PALETTE,
                     labels={"atlas_level2": "细胞状态", "fraction_of_captured_atlas": "占该供者捕获图谱细胞的比例"},
                 )
                 chart.update_layout(height=420, legend_title_text="")
@@ -147,16 +281,18 @@ def main():
         comparison["fraction_of_captured_atlas"] = comparison.n_cells / comparison.captured_atlas_denominator
         comparison["selected_donor"] = comparison.donor_id.eq(selected)
         comparison["point_size"] = comparison.selected_donor.map({True: 12, False: 6})
+        comparison["donor_role"] = comparison.selected_donor.map({True: "当前供者", False: "其他供者"})
         fig = px.scatter(
-            comparison, x="age_years", y="fraction_of_captured_atlas", color="selected_donor",
+            comparison, x="age_years", y="fraction_of_captured_atlas", color="donor_role",
+            color_discrete_map={"当前供者": "#c95858", "其他供者": "#5e9ca0"},
             size="point_size", size_max=14,
             hover_data=["donor_id", "sex", "n_cells", "captured_atlas_denominator"],
             labels={"age_years": "年龄（岁）", "fraction_of_captured_atlas": "占该供者捕获细胞的比例",
-                    "selected_donor": "当前供者"},
+                    "donor_role": "供者"},
         )
         fig.update_layout(height=360)
         st.plotly_chart(fig, use_container_width=True)
-        st.dataframe(comparison.drop(columns=["point_size"]), use_container_width=True, hide_index=True)
+        st.dataframe(comparison.drop(columns=["point_size", "selected_donor"]), use_container_width=True, hide_index=True)
         st.caption("每个点是一位供者。此处显示描述性组成，不将细胞视为独立生物学重复，也不展示未校正的年龄效应。")
         st.download_button("下载当前供者元数据", csv_bytes(donors.loc[donors.donor_id.eq(selected)]),
                            file_name=f"{selected}_metadata.csv", mime="text/csv")
@@ -165,7 +301,7 @@ def main():
 
     with download_tab:
         st.subheader("结果与代码下载")
-        st.write("下载与当前页面一致的修正供者表、图谱坐标、分层覆盖和供者级细胞组成。")
+        st.write("下载修正供者表、图谱坐标、分层覆盖、供者级细胞组成与基因表达参考。")
         files = download_data(donors, cells)
         source = source_files(ROOT)
         a, b, c = st.columns(3)

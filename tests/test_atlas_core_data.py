@@ -75,10 +75,18 @@ def test_real_app_has_only_three_tabs_and_correct_donor_age():
     assert any(metric.label == "年龄" and metric.value == "1.75 岁" for metric in app.metric)
     assert not any("predicted" in metric.label.lower() for metric in app.metric)
     assert not app.get("file_uploader")
-    app.radio[0].set_value("年龄").run()
+    next(radio for radio in app.radio if radio.label == "图谱着色").set_value("年龄").run()
     assert not app.exception, str(app.exception)
     next(selector for selector in app.selectbox if selector.label == "选择供者").set_value("donor3").run()
     assert any(metric.label == "年龄" and metric.value == "24 岁" for metric in app.metric)
     assert not app.exception, str(app.exception)
     app.multiselect[0].set_value([]).run()
     assert not app.exception, str(app.exception)
+    next(radio for radio in app.radio if radio.label == "浏览内容").set_value("基因查询").run()
+    assert not app.exception, str(app.exception)
+    assert len(app.tabs) == 3
+    gene_selector = next(selector for selector in app.selectbox if selector.label == "基因符号")
+    assert gene_selector.value == "CD3D"
+    gene_selector.set_value("FOXN1").run()
+    assert not app.exception, str(app.exception)
+    assert len(app.get("imgs")) >= 2

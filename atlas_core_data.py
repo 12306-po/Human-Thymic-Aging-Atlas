@@ -143,5 +143,8 @@ def zip_bytes(files: dict[str, bytes]) -> bytes:
 
 
 def source_files(root: Path) -> dict[str, bytes]:
-    names = ["app.py", "atlas_core_data.py", "requirements-core.txt", "docs/core_site.md"]
+    names = ["app.py", "atlas_core_data.py", "atlas_gene_data.py", "requirements-core.txt",
+             "docs/core_site.md", "build_gene_reference_bundle.py", "import_corrected_gene_evidence.py",
+             ".streamlit/config.toml", "assets/ATTRIBUTIONS.md",
+             "assets/healthy_human_t_cell.jpg", "assets/thymus_lobule_nih_bioart.svg"]
     return {name: (root / name).read_bytes() for name in names}
